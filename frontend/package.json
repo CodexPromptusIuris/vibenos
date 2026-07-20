@@ -1,0 +1,7 @@
+{
+  "name": "vibenos-frontend",
+  "private": true,
+  "scripts": {
+    "build": "echo 'static' && mkdir -p dist && cp -r . dist/"
+  }
+}
