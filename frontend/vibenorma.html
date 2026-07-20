@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<!-- saved from url=(0047)https://codexpromptusiuris.github.io/Vibenorma/ -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VibeNORMA Compliance — Ley 21.719</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+  :root{
+    --bg:#0F1013; --panel:#17191F; --panel-2:#1D2028; --panel-3:#242833; --border:#2A2E38;
+    --red:#C7472F; --blue:#4C7CE0; --green:#5FBF7A; --amber:#E0A94C; --purple:#8A6FD8;
+    --text:#E8E9EC; --text-dim:#9198A3; --text-dimmer:#5A606B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+
+  /* SHELL */
+  #app{display:flex;min-height:100vh;}
+  .sidebar{width:230px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+  .brand{padding:18px 16px;border-bottom:1px solid var(--border);}
+  .brand .mark{width:32px;height:32px;border-radius:7px;background:linear-gradient(135deg,var(--purple),var(--blue));display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12px;margin-bottom:8px;}
+  .brand h1{font-size:14px;font-weight:700;}
+  .brand .sub{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--text-dim);margin-top:2px;letter-spacing:.03em;}
+
+  .apdp-status{margin:12px 14px;padding:10px 12px;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;}
+  .apdp-status .lbl{font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+  .apdp-ring{display:flex;align-items:center;gap:8px;}
+  .apdp-pct{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:20px;}
+  .apdp-bar-track{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+  .apdp-bar-fill{height:100%;border-radius:3px;transition:width .4s;}
+
+  nav{flex:1;padding:8px;}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:6px;cursor:pointer;font-size:12.5px;color:var(--text-dim);margin-bottom:2px;border:1px solid transparent;transition:all .12s;}
+  .nav-item:hover{background:var(--panel-2);color:var(--text);}
+  .nav-item.active{background:rgba(138,111,216,0.12);border-color:rgba(138,111,216,0.3);color:var(--text);}
+  .nav-item .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+  .nav-item .badge{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9px;padding:1px 6px;border-radius:8px;background:var(--panel-3);color:var(--text-dim);}
+  .nav-item .badge.warn{background:rgba(224,169,76,.18);color:var(--amber);}
+  .nav-item .badge.ok{background:rgba(95,191,122,.18);color:var(--green);}
+  .nav-sec{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:.08em;padding:14px 10px 6px;}
+
+  .sidebar-footer{padding:12px 14px;border-top:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--text-dimmer);}
+
+  main{flex:1;min-width:0;}
+  .topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px;position:sticky;top:0;background:rgba(15,16,19,.92);backdrop-filter:blur(8px);z-index:50;}
+  .topbar h2{font-size:16px;font-weight:700;}
+  .topbar .sub{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--text-dim);}
+  .topbar-right{margin-left:auto;display:flex;gap:8px;align-items:center;}
+  .content{padding:22px 26px 60px;max-width:1180px;}
+
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;}
+  .panel-head{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .panel-head .name{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-dim);}
+  .panel-body{padding:16px;}
+
+  .btn{font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;background:transparent;border:1px solid var(--border);color:var(--text-dim);padding:7px 12px;border-radius:5px;cursor:pointer;transition:all .12s;}
+  .btn:hover{border-color:var(--blue);color:var(--blue);}
+  .btn.primary{background:var(--purple);border-color:var(--purple);color:#fff;}
+  .btn.primary:hover{opacity:.9;color:#fff;}
+  .btn.approve{border-color:var(--green);color:var(--green);}
+  .btn.approve:hover{background:rgba(95,191,122,.1);color:var(--green);}
+  .btn.reject{border-color:var(--red);color:var(--red);}
+  .btn.reject:hover{background:rgba(199,71,47,.1);color:var(--red);}
+  .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+
+  input,select,textarea{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--panel-2);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:5px;width:100%;outline:none;}
+  input:focus,select:focus,textarea:focus{border-color:var(--purple);}
+  label.field-lbl{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px;}
+  .field{margin-bottom:12px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+
+  table{width:100%;border-collapse:collapse;}
+  th{font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-dimmer);text-align:left;padding:8px 8px;border-bottom:1px solid var(--border);}
+  td{font-size:11.5px;padding:9px 8px;border-bottom:1px solid rgba(42,46,56,.6);vertical-align:top;}
+  tr:hover td{background:rgba(255,255,255,.015);}
+
+  .pill{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;display:inline-block;white-space:nowrap;}
+  .pill.green{background:rgba(95,191,122,.15);color:var(--green);}
+  .pill.amber{background:rgba(224,169,76,.15);color:var(--amber);}
+  .pill.red{background:rgba(199,71,47,.15);color:var(--red);}
+  .pill.blue{background:rgba(76,124,224,.15);color:var(--blue);}
+  .pill.purple{background:rgba(138,111,216,.15);color:var(--purple);}
+  .pill.grey{background:var(--panel-3);color:var(--text-dim);}
+
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+  .stat{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;}
+  .stat .lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+  .stat .val{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:700;}
+
+  .empty{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-dimmer);text-align:center;padding:22px 4px;}
+
+  .hitl-item{background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:11px 12px;margin-bottom:9px;}
+  .hitl-item .top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;}
+  .hitl-item .desc{font-size:12px;line-height:1.5;margin-bottom:6px;}
+  .hitl-item .meta{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text-dimmer);}
+
+  .timeline{border-left:2px solid var(--border);padding-left:14px;margin-left:6px;}
+  .tl-item{margin-bottom:14px;position:relative;}
+  .tl-item::before{content:'';position:absolute;left:-19px;top:3px;width:9px;height:9px;border-radius:50%;background:var(--purple);border:2px solid var(--panel);}
+  .tl-item .tl-time{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--text-dimmer);}
+  .tl-item .tl-desc{font-size:11.5px;margin-top:2px;}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--panel);border:1px solid var(--border);border-radius:9px;width:100%;max-width:640px;}
+  .modal-head{padding:15px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .modal-head h3{font-size:14px;}
+  .modal-body{padding:18px;max-height:70vh;overflow-y:auto;}
+  .modal-foot{padding:14px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
+  .modal-close{background:none;border:none;color:var(--text-dim);font-size:18px;cursor:pointer;}
+
+  .toast{position:fixed;bottom:20px;right:20px;background:var(--panel);border:1px solid var(--green);border-radius:8px;padding:11px 16px;font-family:'IBM Plex Mono',monospace;font-size:11px;z-index:2000;transform:translateY(120px);transition:transform .3s;box-shadow:0 6px 24px rgba(0,0,0,.4);}
+  .toast.show{transform:translateY(0);}
+  .toast .tt{color:var(--green);font-weight:700;margin-bottom:2px;}
+
+  .req-progress{display:flex;gap:3px;margin-top:8px;}
+  .req-seg{flex:1;height:5px;border-radius:3px;background:var(--border);}
+  .req-seg.done{background:var(--green);}
+
+  .countdown{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--purple);border-left:3px solid var(--purple);border-radius:7px;padding:11px 16px;margin-bottom:18px;}
+  .countdown .txt{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--text-dim);}
+  .countdown .days{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:700;color:var(--purple);}
+
+  .checklist-item{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid rgba(42,46,56,.6);}
+  .checklist-item:last-child{border-bottom:none;}
+  .checklist-item input[type=checkbox]{width:auto;margin-top:2px;accent-color:var(--purple);}
+  .checklist-item .txt{font-size:11.5px;flex:1;}
+  .checklist-item .txt.done{color:var(--text-dimmer);text-decoration:line-through;}
+
+  .breach-timer{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;}
+  .breach-timer.ok{color:var(--green);}
+  .breach-timer.warn{color:var(--amber);}
+  .breach-timer.late{color:var(--red);}
+
+  .hash-tag{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text-dimmer);}
+  .save-status{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--text-dimmer);}
+  .save-status.saved{color:var(--green);}
+
+  @media (max-width:900px){
+    #app{flex-direction:column;}
+    .sidebar{width:100%;height:auto;position:relative;flex-direction:row;overflow-x:auto;}
+    nav{display:flex;padding:6px;}
+    .nav-sec{display:none;}
+    .stat-grid,.row2,.row3{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="brand">
+      <div class="mark">VN</div>
+      <h1>VibeNORMA Compliance</h1>
+      <div class="sub">MODELO DE PREVENCIÓN · LEY 21.719</div>
+    </div>
+    <div class="apdp-status">
+      <div class="lbl">Preparación general</div>
+      <div class="apdp-ring">
+        <span class="apdp-pct mono" id="globalPct" style="color: var(--red);">17%</span>
+        <div class="apdp-bar-track"><div class="apdp-bar-fill" id="globalBar" style="width: 17%; background: var(--red);"></div></div>
+      </div>
+    </div>
+    <nav id="navList"><div class="nav-sec">General</div><div class="nav-item active" onclick="goPage(&#39;dashboard&#39;)">
+      <span class="dot" style="background:var(--purple)"></span>
+      <span>Dashboard</span>
+    </div><div class="nav-sec">Modelo de prevención (Art. 48)</div><div class="nav-item " onclick="goPage(&#39;rat&#39;)">
+      <span class="dot" style="background:var(--blue)"></span>
+      <span>RAT — Registro de tratamientos</span>
+    </div><div class="nav-item " onclick="goPage(&#39;dpd&#39;)">
+      <span class="dot" style="background:var(--purple)"></span>
+      <span>Delegado de Protección de Datos</span>
+    </div><div class="nav-item " onclick="goPage(&#39;eipd&#39;)">
+      <span class="dot" style="background:var(--amber)"></span>
+      <span>Evaluación de impacto (EIPD)</span>
+    </div><div class="nav-item " onclick="goPage(&#39;breaches&#39;)">
+      <span class="dot" style="background:var(--red)"></span>
+      <span>Gestión de brechas (72h)</span>
+    </div><div class="nav-item " onclick="goPage(&#39;arco&#39;)">
+      <span class="dot" style="background:var(--green)"></span>
+      <span>Derechos ARCO+</span>
+    </div><div class="nav-item " onclick="goPage(&#39;contracts&#39;)">
+      <span class="dot" style="background:var(--blue)"></span>
+      <span>Contratos / DPA</span>
+    </div><div class="nav-sec">Trazabilidad</div><div class="nav-item " onclick="goPage(&#39;hitl&#39;)">
+      <span class="dot" style="background:var(--purple)"></span>
+      <span>Human-in-the-loop</span>
+    </div><div class="nav-item " onclick="goPage(&#39;audit&#39;)">
+      <span class="dot" style="background:var(--text-dimmer)"></span>
+      <span>Registro de auditoría</span>
+    </div></nav>
+    <div class="sidebar-footer">
+      <div>ESTADO: <span class="save-status" id="saveStatus">—</span></div>
+      <div style="margin-top:4px;">CADENA: <span id="chainInfo">0 entradas</span></div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main>
+    <div class="topbar">
+      <div>
+        <h2 id="pageTitle">Dashboard</h2>
+        <div class="sub" id="pageSub">Visión general del modelo de prevención de infracciones</div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn" id="exportAllBtn">EXPORTAR EXPEDIENTE COMPLETO (JSON)</button>
+      </div>
+    </div>
+    <div class="content" id="content">
+    <div class="countdown">
+      <div class="txt">Vigencia plena Ley 21.719 (reforma a Ley 19.628): <b style="color:var(--text)">1 de diciembre de 2026</b> — evidencia exigible ante la APDP en las seis áreas del modelo de prevención (Art. 48).</div>
+      <div class="days">135 días</div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat"><div class="lbl">Preparación global</div><div class="val" style="color:var(--red)">17%</div></div>
+      <div class="stat"><div class="lbl">Pendientes HITL</div><div class="val" style="color:var(--green)">0</div></div>
+      <div class="stat"><div class="lbl">Brechas fuera de plazo</div><div class="val" style="color:var(--green)">0</div></div>
+      <div class="stat"><div class="lbl">Solicitudes ARCO+ abiertas</div><div class="val" style="color:var(--green)">0</div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span class="name">Nivel de preparación por área — Art. 48</span></div>
+      <div class="panel-body">
+  
+      <div style="margin-bottom:14px;cursor:pointer" onclick="goPage(&#39;rat&#39;)">
+        <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px">
+          <span>RAT — Registro de tratamientos <span class="mono" style="color:var(--text-dimmer);font-size:9.5px">Arts. 3, 14</span></span>
+          <span class="mono" style="color:var(--red)">0%</span>
+        </div>
+        <div class="apdp-bar-track"><div class="apdp-bar-fill" style="width:0%;background:var(--red)"></div></div>
+      </div>
+      <div style="margin-bottom:14px;cursor:pointer" onclick="goPage(&#39;dpd&#39;)">
+        <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px">
+          <span>Delegado de Protección de Datos <span class="mono" style="color:var(--text-dimmer);font-size:9.5px">Art. 50</span></span>
+          <span class="mono" style="color:var(--red)">0%</span>
+        </div>
+        <div class="apdp-bar-track"><div class="apdp-bar-fill" style="width:0%;background:var(--red)"></div></div>
+      </div>
+      <div style="margin-bottom:14px;cursor:pointer" onclick="goPage(&#39;eipd&#39;)">
+        <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px">
+          <span>Evaluación de Impacto (EIPD) <span class="mono" style="color:var(--text-dimmer);font-size:9.5px">Art. 15 ter</span></span>
+          <span class="mono" style="color:var(--red)">0%</span>
+        </div>
+        <div class="apdp-bar-track"><div class="apdp-bar-fill" style="width:0%;background:var(--red)"></div></div>
+      </div>
+      <div style="margin-bottom:14px;cursor:pointer" onclick="goPage(&#39;breaches&#39;)">
+        <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px">
+          <span>Gestión de brechas (72h) <span class="mono" style="color:var(--text-dimmer);font-size:9.5px">Art. 14 sexies</span></span>
+          <span class="mono" style="color:var(--amber)">40%</span>
+        </div>
+        <div class="apdp-bar-track"><div class="apdp-bar-fill" style="width:40%;background:var(--amber)"></div></div>
+      </div>
+      <div style="margin-bottom:14px;cursor:pointer" onclick="goPage(&#39;arco&#39;)">
+        <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px">
+          <span>Derechos ARCO+ <span class="mono" style="color:var(--text-dimmer);font-size:9.5px">Arts. 5–9</span></span>
+          <span class="mono" style="color:var(--amber)">60%</span>
+        </div>
+        <div class="apdp-bar-track"><div class="apdp-bar-fill" style="width:60%;background:var(--amber)"></div></div>
+      </div>
+      <div style="margin-bottom:14px;cursor:pointer" onclick="goPage(&#39;contracts&#39;)">
+        <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px">
+          <span>Contratos / DPA <span class="mono" style="color:var(--text-dimmer);font-size:9.5px">Arts. 15, 15 bis</span></span>
+          <span class="mono" style="color:var(--red)">0%</span>
+        </div>
+        <div class="apdp-bar-track"><div class="apdp-bar-fill" style="width:0%;background:var(--red)"></div></div>
+      </div></div></div>
+    <div class="panel">
+      <div class="panel-head"><span class="name">Actividad reciente</span></div>
+      <div class="panel-body">
+        <div class="timeline">
+  <div class="empty">SIN ACTIVIDAD REGISTRADA</div></div></div></div></div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head"><h3 id="modalTitle">Título</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot" id="modalFoot"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><div class="tt" id="toastTitle">✓ Listo</div><div id="toastBody"></div></div>
+
+<script>
+/* ============================================================
+   ESTADO GLOBAL Y PERSISTENCIA
+============================================================ */
+const STORAGE_KEY = 'vibenorma-compliance:v1';
+const DEADLINE = '2026-12-01';
+
+let state = {
+  currentPage: 'dashboard',
+  // 1. RAT — Registro de Actividades de Tratamiento
+  rat: [],
+  // 2. DPD — Delegado de Protección de Datos
+  dpd: { name:'', email:'', role:'', appointedDate:'', formalized:false, backupName:'', backupEmail:'' },
+  // 3. EIPD — Evaluaciones de Impacto
+  eipd: [],
+  // 4. Brechas de seguridad (72h)
+  breaches: [],
+  // 5. Solicitudes ARCO+
+  arco: [],
+  // 6. Contratos / DPA con encargados y transferencias internacionales
+  contracts: [],
+  // HITL queue (transversal)
+  hitlQueue: [],
+  // Cadena de auditoría
+  auditLog: [],
+};
+
+function uid(p){ return p + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function daysUntil(dateStr){ if(!dateStr) return 999; const d1=new Date(todayStr()); const d2=new Date(dateStr); return Math.round((d2-d1)/(1000*60*60*24)); }
+function hoursSince(iso){ return (Date.now()-new Date(iso).getTime())/36e5; }
+function fmtDate(iso){ return iso ? new Date(iso).toLocaleString('es-CL',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—'; }
+
+async function loadState(){
+  try{
+    const r = await window.storage.get(STORAGE_KEY, false);
+    if(r && r.value){ state = Object.assign(state, JSON.parse(r.value)); }
+    else{
+      await appendAudit('sistema','inicializacion','Sistema de cumplimiento Ley 21.719 inicializado','aprobado',null,'sistema');
+      await saveState();
+    }
+  }catch(e){ /* estado por defecto */ }
+  render();
+}
+async function saveState(){
+  const el = document.getElementById('saveStatus');
+  try{
+    el.textContent='GUARDANDO…'; el.classList.remove('saved');
+    await window.storage.set(STORAGE_KEY, JSON.stringify(state), false);
+    el.textContent='GUARDADO'; el.classList.add('saved');
+  }catch(e){ el.textContent='ERROR (sesión local)'; el.classList.remove('saved'); }
+}
+
+/* ============================================================
+   CADENA DE AUDITORÍA — SHA-256 encadenada (trazabilidad)
+============================================================ */
+async function sha256Hex(str){
+  const enc = new TextEncoder().encode(str);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function appendAudit(actor, area, description, resolution, refId, module){
+  const prevHash = state.auditLog.length ? state.auditLog[state.auditLog.length-1].hash : 'GENESIS';
+  const entry = {
+    seq: state.auditLog.length+1, timestamp: new Date().toISOString(),
+    actor, area, module: module||area, description, resolution, refId: refId||null, prevHash
+  };
+  entry.hash = await sha256Hex(JSON.stringify(entry)+prevHash);
+  state.auditLog.push(entry);
+  return entry;
+}
+
+/* ============================================================
+   HITL — cola transversal de aprobación humana
+============================================================ */
+function requestHitl(module, actionType, description, refId, requestedBy, payload){
+  state.hitlQueue.push({ id:uid('h'), module, actionType, description, refId, requestedBy, payload: payload||null, createdAt:new Date().toISOString() });
+}
+async function resolveHitl(itemId, resolution){
+  const idx = state.hitlQueue.findIndex(h=>h.id===itemId);
+  if(idx===-1) return;
+  const item = state.hitlQueue[idx];
+  if(resolution==='aprobado' && item.payload && item.payload.onApprove){
+    applyHitlPayload(item);
+  }
+  await appendAudit(item.requestedBy||'usuario', item.module, item.description, resolution, item.refId, item.module);
+  state.hitlQueue.splice(idx,1);
+  await saveState(); render();
+  showToast(resolution==='aprobado'?'Solicitud aprobada':'Solicitud rechazada', item.description.slice(0,70));
+}
+function applyHitlPayload(item){
+  const p = item.payload;
+  if(p.onApprove==='arco_status'){
+    const req = state.arco.find(r=>r.id===p.reqId);
+    if(req) req.status = p.newStatus;
+  }
+  if(p.onApprove==='breach_notify'){
+    const b = state.breaches.find(x=>x.id===p.breachId);
+    if(b) b.apdpNotified = true, b.apdpNotifiedAt = new Date().toISOString();
+  }
+  if(p.onApprove==='eipd_approve'){
+    const e = state.eipd.find(x=>x.id===p.eipdId);
+    if(e) e.status = 'aprobada';
+  }
+  if(p.onApprove==='contract_sign'){
+    const c = state.contracts.find(x=>x.id===p.contractId);
+    if(c) c.status = 'vigente';
+  }
+}
+
+/* ============================================================
+   TOAST / MODAL
+============================================================ */
+function showToast(title, body){
+  const t=document.getElementById('toast');
+  document.getElementById('toastTitle').textContent='✓ '+title;
+  document.getElementById('toastBody').textContent=body||'';
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3500);
+}
+function openModal(title, bodyHtml, footHtml){
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalBody').innerHTML=bodyHtml;
+  document.getElementById('modalFoot').innerHTML=footHtml||'';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); }
+document.getElementById('modalOverlay').addEventListener('click',e=>{ if(e.target.id==='modalOverlay') closeModal(); });
+
+/* ============================================================
+   NAVEGACIÓN
+============================================================ */
+const PAGES = [
+  { sec:'General', id:'dashboard', label:'Dashboard', icon:'●', color:'purple' },
+  { sec:'Modelo de prevención (Art. 48)', id:'rat', label:'RAT — Registro de tratamientos', color:'blue' },
+  { sec:'Modelo de prevención (Art. 48)', id:'dpd', label:'Delegado de Protección de Datos', color:'purple' },
+  { sec:'Modelo de prevención (Art. 48)', id:'eipd', label:'Evaluación de impacto (EIPD)', color:'amber' },
+  { sec:'Modelo de prevención (Art. 48)', id:'breaches', label:'Gestión de brechas (72h)', color:'red' },
+  { sec:'Modelo de prevención (Art. 48)', id:'arco', label:'Derechos ARCO+', color:'green' },
+  { sec:'Modelo de prevención (Art. 48)', id:'contracts', label:'Contratos / DPA', color:'blue' },
+  { sec:'Trazabilidad', id:'hitl', label:'Human-in-the-loop', color:'purple' },
+  { sec:'Trazabilidad', id:'audit', label:'Registro de auditoría', color:'grey' },
+];
+
+function renderNav(){
+  const nav = document.getElementById('navList');
+  let html=''; let lastSec=null;
+  PAGES.forEach(p=>{
+    if(p.sec!==lastSec){ html+=`<div class="nav-sec">${p.sec}</div>`; lastSec=p.sec; }
+    const badge = navBadge(p.id);
+    html += `<div class="nav-item ${state.currentPage===p.id?'active':''}" onclick="goPage('${p.id}')">
+      <span class="dot" style="background:var(--${p.color==='grey'?'text-dimmer':p.color})"></span>
+      <span>${p.label}</span>${badge}
+    </div>`;
+    lastSec=p.sec;
+  });
+  nav.innerHTML = html;
+}
+function navBadge(id){
+  if(id==='hitl' && state.hitlQueue.length) return `<span class="badge warn">${state.hitlQueue.length}</span>`;
+  if(id==='breaches'){
+    const open = state.breaches.filter(b=>!b.apdpNotified && hoursSince(b.detectedAt)<72).length;
+    const late = state.breaches.filter(b=>!b.apdpNotified && hoursSince(b.detectedAt)>=72).length;
+    if(late) return `<span class="badge warn" style="background:rgba(199,71,47,.18);color:var(--red)">${late}</span>`;
+    if(open) return `<span class="badge warn">${open}</span>`;
+  }
+  if(id==='arco'){ const pend = state.arco.filter(r=>r.status==='pendiente').length; if(pend) return `<span class="badge warn">${pend}</span>`; }
+  if(id==='rat'){ return state.rat.length ? `<span class="badge ok">${state.rat.length}</span>` : ''; }
+  return '';
+}
+function goPage(id){ state.currentPage=id; render(); }
+
+/* ============================================================
+   CÁLCULO DE PREPARACIÓN (readiness) por área — Art. 48
+============================================================ */
+function areaReadiness(area){
+  switch(area){
+    case 'rat': return state.rat.length ? Math.min(100, state.rat.length*20) : 0;
+    case 'dpd': {
+      let s=0; if(state.dpd.name) s+=25; if(state.dpd.email) s+=25; if(state.dpd.formalized) s+=30; if(state.dpd.backupName) s+=20;
+      return s;
+    }
+    case 'eipd': {
+      if(!state.eipd.length) return 0;
+      const done = state.eipd.filter(e=>e.status==='aprobada').length;
+      return Math.round((done/state.eipd.length)*100);
+    }
+    case 'breaches': {
+      const hasProcedure = state.contracts.some(()=>false); // placeholder no-op
+      let s = 40; // procedimiento base siempre documentado en el módulo
+      const late = state.breaches.some(b=>!b.apdpNotified && hoursSince(b.detectedAt)>=72);
+      if(late) s = 15;
+      const allResolved = state.breaches.length && state.breaches.every(b=>b.apdpNotified);
+      if(allResolved) s = 100;
+      return s;
+    }
+    case 'arco': {
+      if(!state.arco.length) return 60; // flujo listo, sin solicitudes aún
+      const resolved = state.arco.filter(r=>r.status==='resuelto').length;
+      return Math.round((resolved/state.arco.length)*100);
+    }
+    case 'contracts': {
+      if(!state.contracts.length) return 0;
+      const signed = state.contracts.filter(c=>c.status==='vigente').length;
+      return Math.round((signed/state.contracts.length)*100);
+    }
+    default: return 0;
+  }
+}
+function globalReadiness(){
+  const areas=['rat','dpd','eipd','breaches','arco','contracts'];
+  const sum = areas.reduce((a,ar)=>a+areaReadiness(ar),0);
+  return Math.round(sum/areas.length);
+}
+function readinessColor(pct){ return pct>=70?'var(--green)':pct>=40?'var(--amber)':'var(--red)'; }
+
+/* ============================================================
+   RENDER ORQUESTADOR
+============================================================ */
+function render(){
+  renderNav();
+  const titles = {
+    dashboard:['Dashboard','Visión general del modelo de prevención de infracciones'],
+    rat:['RAT — Registro de Actividades de Tratamiento','Inventario obligatorio de tratamientos de datos personales'],
+    dpd:['Delegado de Protección de Datos','Designación formal y datos de contacto operativo'],
+    eipd:['Evaluación de Impacto en Protección de Datos','Análisis de riesgo previo en tratamientos de alto riesgo (Art. 15 ter)'],
+    breaches:['Gestión de brechas de seguridad','Notificación a la APDP en 72 horas (Art. 14 sexies)'],
+    arco:['Derechos ARCO+','Acceso · Rectificación · Cancelación · Oposición · Portabilidad · Bloqueo'],
+    contracts:['Contratos y DPA','Encargados de tratamiento y transferencias internacionales'],
+    hitl:['Human-in-the-loop','Cola de aprobación humana para acciones sensibles'],
+    audit:['Registro de auditoría','Cadena de trazabilidad SHA-256 encadenada'],
+  };
+  document.getElementById('pageTitle').textContent = titles[state.currentPage][0];
+  document.getElementById('pageSub').textContent = titles[state.currentPage][1];
+
+  const gp = globalReadiness();
+  document.getElementById('globalPct').textContent = gp+'%';
+  document.getElementById('globalPct').style.color = readinessColor(gp);
+  document.getElementById('globalBar').style.width = gp+'%';
+  document.getElementById('globalBar').style.background = readinessColor(gp);
+  document.getElementById('chainInfo').textContent = state.auditLog.length+' entradas';
+
+  const c = document.getElementById('content');
+  const renderers = { dashboard:renderDashboard, rat:renderRat, dpd:renderDpd, eipd:renderEipd, breaches:renderBreaches, arco:renderArco, contracts:renderContracts, hitl:renderHitl, audit:renderAudit };
+  c.innerHTML='';
+  renderers[state.currentPage]();
+}
+
+/* ============================================================
+   DASHBOARD
+============================================================ */
+function renderDashboard(){
+  const c = document.getElementById('content');
+  const days = daysUntil(DEADLINE);
+  const areas = [
+    {id:'rat', label:'RAT — Registro de tratamientos', art:'Arts. 3, 14'},
+    {id:'dpd', label:'Delegado de Protección de Datos', art:'Art. 50'},
+    {id:'eipd', label:'Evaluación de Impacto (EIPD)', art:'Art. 15 ter'},
+    {id:'breaches', label:'Gestión de brechas (72h)', art:'Art. 14 sexies'},
+    {id:'arco', label:'Derechos ARCO+', art:'Arts. 5–9'},
+    {id:'contracts', label:'Contratos / DPA', art:'Arts. 15, 15 bis'},
+  ];
+  const pending = state.hitlQueue.length;
+  const lateBreach = state.breaches.filter(b=>!b.apdpNotified && hoursSince(b.detectedAt)>=72).length;
+  const openArco = state.arco.filter(r=>r.status==='pendiente').length;
+
+  let html = `
+    <div class="countdown">
+      <div class="txt">Vigencia plena Ley 21.719 (reforma a Ley 19.628): <b style="color:var(--text)">1 de diciembre de 2026</b> — evidencia exigible ante la APDP en las seis áreas del modelo de prevención (Art. 48).</div>
+      <div class="days">${days>=0?days+' días':'PLAZO CUMPLIDO'}</div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat"><div class="lbl">Preparación global</div><div class="val" style="color:${readinessColor(globalReadiness())}">${globalReadiness()}%</div></div>
+      <div class="stat"><div class="lbl">Pendientes HITL</div><div class="val" style="color:${pending?'var(--amber)':'var(--green)'}">${pending}</div></div>
+      <div class="stat"><div class="lbl">Brechas fuera de plazo</div><div class="val" style="color:${lateBreach?'var(--red)':'var(--green)'}">${lateBreach}</div></div>
+      <div class="stat"><div class="lbl">Solicitudes ARCO+ abiertas</div><div class="val" style="color:${openArco?'var(--amber)':'var(--green)'}">${openArco}</div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span class="name">Nivel de preparación por área — Art. 48</span></div>
+      <div class="panel-body">
+  `;
+  areas.forEach(a=>{
+    const pct = areaReadiness(a.id);
+    html += `
+      <div style="margin-bottom:14px;cursor:pointer" onclick="goPage('${a.id}')">
+        <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px">
+          <span>${a.label} <span class="mono" style="color:var(--text-dimmer);font-size:9.5px">${a.art}</span></span>
+          <span class="mono" style="color:${readinessColor(pct)}">${pct}%</span>
+        </div>
+        <div class="apdp-bar-track"><div class="apdp-bar-fill" style="width:${pct}%;background:${readinessColor(pct)}"></div></div>
+      </div>`;
+  });
+  html += `</div></div>`;
+
+  html += `
+    <div class="panel">
+      <div class="panel-head"><span class="name">Actividad reciente</span></div>
+      <div class="panel-body">
+        <div class="timeline">
+  `;
+  const recent = [...state.auditLog].reverse().slice(0,8);
+  if(!recent.length){ html += `<div class="empty">SIN ACTIVIDAD REGISTRADA</div>`; }
+  recent.forEach(e=>{
+    html += `<div class="tl-item"><div class="tl-time mono">${fmtDate(e.timestamp)} · ${e.area}</div><div class="tl-desc">${escapeHtml(e.description)} <span class="pill ${e.resolution==='aprobado'?'green':e.resolution==='rechazado'?'red':'grey'}">${e.resolution}</span></div></div>`;
+  });
+  html += `</div></div></div>`;
+  c.innerHTML = html;
+}
+
+function escapeHtml(str){ const d=document.createElement('div'); d.textContent=str||''; return d.innerHTML; }
+
+/* ============================================================
+   1. RAT — REGISTRO DE ACTIVIDADES DE TRATAMIENTO
+============================================================ */
+function renderRat(){
+  const c = document.getElementById('content');
+  let html = `
+    <div class="panel">
+      <div class="panel-head">
+        <span class="name">Inventario de tratamientos (${state.rat.length})</span>
+        <button class="btn primary" onclick="openRatForm()">+ NUEVO TRATAMIENTO</button>
+      </div>
+      <div class="panel-body">
+  `;
+  if(!state.rat.length){ html += `<div class="empty">SIN TRATAMIENTOS REGISTRADOS. Cada operación que trate datos personales debe quedar aquí: finalidad, base de licitud, categorías de datos, plazo de conservación y destinatarios (Arts. 3° y 14).</div>`; }
+  else{
+    html += `<table><thead><tr><th>Tratamiento</th><th>Finalidad</th><th>Base legal</th><th>Categorías</th><th>Conservación</th><th>Riesgo</th><th></th></tr></thead><tbody>`;
+    state.rat.forEach(t=>{
+      html += `<tr>
+        <td><b>${escapeHtml(t.name)}</b><div class="mono" style="color:var(--text-dimmer);font-size:9.5px">${t.area||''}</div></td>
+        <td>${escapeHtml(t.purpose)}</td>
+        <td><span class="pill blue">${t.legalBasis}</span></td>
+        <td>${(t.categories||[]).map(x=>`<span class="pill grey" style="margin-right:3px">${x}</span>`).join('')}</td>
+        <td class="mono">${t.retention||'—'}</td>
+        <td><span class="pill ${t.risk==='alto'?'red':t.risk==='medio'?'amber':'green'}">${t.risk}</span></td>
+        <td><button class="btn" onclick="deleteRat('${t.id}')">Eliminar</button></td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+  }
+  html += `</div></div>`;
+  c.innerHTML = html;
+}
+function openRatForm(){
+  openModal('Nuevo tratamiento de datos', `
+    <div class="field"><label class="field-lbl">Nombre del tratamiento</label><input id="rf-name" placeholder="Ej: Onboarding de clientes B2B"></div>
+    <div class="field"><label class="field-lbl">Área / sistema responsable</label><input id="rf-area" placeholder="Ej: Ventas / CRM"></div>
+    <div class="field"><label class="field-lbl">Finalidad específica</label><textarea id="rf-purpose" rows="2" placeholder="Para qué se tratan estos datos, en términos concretos"></textarea></div>
+    <div class="row2">
+      <div class="field"><label class="field-lbl">Base de licitud</label>
+        <select id="rf-legal"><option>Consentimiento</option><option>Ejecución de contrato</option><option>Obligación legal</option><option>Interés legítimo</option><option>Interés vital</option></select>
+      </div>
+      <div class="field"><label class="field-lbl">Nivel de riesgo</label>
+        <select id="rf-risk"><option value="bajo">Bajo</option><option value="medio">Medio</option><option value="alto">Alto</option></select>
+      </div>
+    </div>
+    <div class="field"><label class="field-lbl">Categorías de datos (separadas por coma)</label><input id="rf-cat" placeholder="Ej: identificación, financieros, ubicación"></div>
+    <div class="field"><label class="field-lbl">Plazo de conservación</label><input id="rf-ret" placeholder="Ej: 5 años desde el término de la relación"></div>
+  `, `<button class="btn" onclick="closeModal()">Cancelar</button><button class="btn primary" onclick="saveRat()">Guardar y registrar en cadena</button>`);
+}
+async function saveRat(){
+  const name = document.getElementById('rf-name').value.trim();
+  if(!name){ return; }
+  const t = {
+    id: uid('t'), name, area: document.getElementById('rf-area').value.trim(),
+    purpose: document.getElementById('rf-purpose').value.trim(),
+    legalBasis: document.getElementById('rf-legal').value,
+    risk: document.getElementById('rf-risk').value,
+    categories: document.getElementById('rf-cat').value.split(',').map(s=>s.trim()).filter(Boolean),
+    retention: document.getElementById('rf-ret').value.trim(),
+    createdAt: new Date().toISOString(),
+  };
+  state.rat.push(t);
+  await appendAudit('usuario','RAT',`Registro de tratamiento creado: "${t.name}"`,'aprobado', t.id, 'rat');
+  await saveState(); closeModal(); render();
+  showToast('Tratamiento registrado', t.name);
+}
+async function deleteRat(id){
+  const t = state.rat.find(x=>x.id===id);
+  state.rat = state.rat.filter(x=>x.id!==id);
+  await appendAudit('usuario','RAT',`Registro de tratamiento eliminado: "${t?t.name:id}"`,'aprobado', id, 'rat');
+  await saveState(); render();
+}
+
+/* ============================================================
+   2. DPD — DELEGADO DE PROTECCIÓN DE DATOS
+============================================================ */
+function renderDpd(){
+  const c = document.getElementById('content');
+  const d = state.dpd;
+  const pct = areaReadiness('dpd');
+  c.innerHTML = `
+    <div class="panel">
+      <div class="panel-head"><span class="name">Designación formal (Art. 50)</span><span class="pill ${pct>=70?'green':pct>=40?'amber':'red'}">${pct}% completo</span></div>
+      <div class="panel-body">
+        <div class="row2">
+          <div class="field"><label class="field-lbl">Nombre del delegado</label><input id="dpd-name" value="${escapeHtml(d.name)}"></div>
+          <div class="field"><label class="field-lbl">Correo de contacto operativo</label><input id="dpd-email" value="${escapeHtml(d.email)}" placeholder="dpd@empresa.cl"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label class="field-lbl">Rol / cargo dentro de la organización</label><input id="dpd-role" value="${escapeHtml(d.role)}"></div>
+          <div class="field"><label class="field-lbl">Fecha de designación</label><input type="date" id="dpd-date" value="${d.appointedDate||''}"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label class="field-lbl">Delegado suplente (recomendado)</label><input id="dpd-backup" value="${escapeHtml(d.backupName)}"></div>
+          <div class="field"><label class="field-lbl">Correo del suplente</label><input id="dpd-backup-email" value="${escapeHtml(d.backupEmail)}"></div>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin-top:6px">
+          <input type="checkbox" id="dpd-formal" ${d.formalized?'checked':''} style="width:auto;accent-color:var(--purple)"> Designación formalizada por escrito ante la organización
+        </label>
+        <div class="btn-row"><button class="btn primary" onclick="saveDpd()">Guardar designación</button></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span class="name">Funciones del delegado (referencia)</span></div>
+      <div class="panel-body">
+        <div class="checklist-item"><span class="txt">Punto de contacto entre la organización, los titulares de datos y la APDP.</span></div>
+        <div class="checklist-item"><span class="txt">Supervisión del cumplimiento del RAT y de las evaluaciones de impacto.</span></div>
+        <div class="checklist-item"><span class="txt">Coordinación de la respuesta a brechas de seguridad dentro del plazo de 72 horas.</span></div>
+        <div class="checklist-item"><span class="txt">Gestión y respuesta de las solicitudes de derechos ARCO+.</span></div>
+      </div>
+    </div>
+  `;
+}
+async function saveDpd(){
+  const before = JSON.stringify(state.dpd);
+  state.dpd = {
+    name: document.getElementById('dpd-name').value.trim(),
+    email: document.getElementById('dpd-email').value.trim(),
+    role: document.getElementById('dpd-role').value.trim(),
+    appointedDate: document.getElementById('dpd-date').value,
+    backupName: document.getElementById('dpd-backup').value.trim(),
+    backupEmail: document.getElementById('dpd-backup-email').value.trim(),
+    formalized: document.getElementById('dpd-formal').checked,
+  };
+  if(JSON.stringify(state.dpd)!==before){
+    await appendAudit('usuario','DPD',`Datos del Delegado de Protección de Datos actualizados: ${state.dpd.name||'(sin nombre)'}`,'aprobado', null, 'dpd');
+  }
+  await saveState(); render();
+  showToast('Delegado actualizado');
+}
+
+/* ============================================================
+   3. EIPD — EVALUACIÓN DE IMPACTO
+============================================================ */
+function renderEipd(){
+  const c = document.getElementById('content');
+  let html = `
+    <div class="panel">
+      <div class="panel-head">
+        <span class="name">Evaluaciones de impacto (${state.eipd.length})</span>
+        <button class="btn primary" onclick="openEipdForm()">+ NUEVA EIPD</button>
+      </div>
+      <div class="panel-body">
+  `;
+  if(!state.eipd.length){ html += `<div class="empty">SIN EVALUACIONES REGISTRADAS. Obligatoria antes de iniciar tratamientos de alto riesgo: perfilamiento, decisiones automatizadas, datos sensibles a gran escala, biometría (Art. 15 ter).</div>`; }
+  else{
+    state.eipd.forEach(e=>{
+      html += `
+        <div class="hitl-item">
+          <div class="top">
+            <b>${escapeHtml(e.title)}</b>
+            <span class="pill ${e.status==='aprobada'?'green':e.status==='revision'?'amber':'grey'}">${e.status}</span>
+          </div>
+          <div class="desc">${escapeHtml(e.description)}</div>
+          <div class="row3" style="margin-bottom:8px">
+            <div><span class="mono" style="color:var(--text-dimmer);font-size:9px">RIESGO INICIAL</span><br><span class="pill ${e.riskBefore==='alto'?'red':'amber'}">${e.riskBefore}</span></div>
+            <div><span class="mono" style="color:var(--text-dimmer);font-size:9px">MITIGACIONES</span><br>${escapeHtml(e.mitigations||'—')}</div>
+            <div><span class="mono" style="color:var(--text-dimmer);font-size:9px">RIESGO RESIDUAL</span><br><span class="pill ${e.riskAfter==='alto'?'red':e.riskAfter==='medio'?'amber':'green'}">${e.riskAfter}</span></div>
+          </div>
+          <div class="btn-row">
+            ${e.status!=='aprobada'?`<button class="btn approve" onclick="requestEipdApproval('${e.id}')">Enviar a aprobación (HITL)</button>`:''}
+            <button class="btn" onclick="deleteEipd('${e.id}')">Eliminar</button>
+          </div>
+        </div>`;
+    });
+  }
+  html += `</div></div>`;
+  c.innerHTML = html;
+}
+function openEipdForm(){
+  openModal('Nueva evaluación de impacto', `
+    <div class="field"><label class="field-lbl">Tratamiento evaluado</label><input id="ef-title" placeholder="Ej: Scoring crediticio automatizado"></div>
+    <div class="field"><label class="field-lbl">Descripción del riesgo</label><textarea id="ef-desc" rows="2" placeholder="Naturaleza, alcance, contexto y fines del tratamiento"></textarea></div>
+    <div class="row2">
+      <div class="field"><label class="field-lbl">Riesgo inicial</label><select id="ef-risk-before"><option value="alto">Alto</option><option value="medio">Medio</option></select></div>
+      <div class="field"><label class="field-lbl">Riesgo residual estimado</label><select id="ef-risk-after"><option value="bajo">Bajo</option><option value="medio">Medio</option><option value="alto">Alto</option></select></div>
+    </div>
+    <div class="field"><label class="field-lbl">Medidas de mitigación</label><textarea id="ef-mit" rows="2" placeholder="Controles técnicos y organizativos aplicados"></textarea></div>
+  `, `<button class="btn" onclick="closeModal()">Cancelar</button><button class="btn primary" onclick="saveEipd()">Guardar evaluación</button>`);
+}
+async function saveEipd(){
+  const title = document.getElementById('ef-title').value.trim();
+  if(!title) return;
+  const e = {
+    id: uid('e'), title, description: document.getElementById('ef-desc').value.trim(),
+    riskBefore: document.getElementById('ef-risk-before').value,
+    riskAfter: document.getElementById('ef-risk-after').value,
+    mitigations: document.getElementById('ef-mit').value.trim(),
+    status: 'revision', createdAt: new Date().toISOString(),
+  };
+  state.eipd.push(e);
+  await appendAudit('usuario','EIPD',`Evaluación de impacto creada: "${e.title}"`,'aprobado', e.id, 'eipd');
+  await saveState(); closeModal(); render();
+  showToast('EIPD registrada', title);
+}
+function requestEipdApproval(id){
+  const e = state.eipd.find(x=>x.id===id);
+  requestHitl('eipd', 'aprobacion', `Aprobar EIPD: "${e.title}" (riesgo residual: ${e.riskAfter})`, id, 'usuario', {onApprove:'eipd_approve', eipdId:id});
+  saveState(); render();
+  showToast('Enviado a HITL', 'Requiere aprobación humana antes de operar el tratamiento');
+}
+async function deleteEipd(id){
+  const e = state.eipd.find(x=>x.id===id);
+  state.eipd = state.eipd.filter(x=>x.id!==id);
+  await appendAudit('usuario','EIPD',`EIPD eliminada: "${e?e.title:id}"`,'aprobado', id, 'eipd');
+  await saveState(); render();
+}
+
+/* ============================================================
+   4. GESTIÓN DE BRECHAS — 72H
+============================================================ */
+function breachStatus(b){
+  const h = hoursSince(b.detectedAt);
+  if(b.apdpNotified) return {label:'NOTIFICADA', cls:'ok'};
+  if(h>=72) return {label:'PLAZO VENCIDO', cls:'late'};
+  if(h>=48) return {label:`${Math.round(72-h)}h restantes`, cls:'warn'};
+  return {label:`${Math.round(72-h)}h restantes`, cls:'ok'};
+}
+function renderBreaches(){
+  const c = document.getElementById('content');
+  let html = `
+    <div class="panel">
+      <div class="panel-head">
+        <span class="name">Incidentes de seguridad (${state.breaches.length})</span>
+        <button class="btn primary" onclick="openBreachForm()">+ REPORTAR BRECHA</button>
+      </div>
+      <div class="panel-body">
+  `;
+  if(!state.breaches.length){ html += `<div class="empty">SIN INCIDENTES REGISTRADOS. Toda vulneración de seguridad debe reportarse a la APDP sin dilaciones indebidas y dentro de 72 horas (Art. 14 sexies).</div>`; }
+  else{
+    state.breaches.forEach(b=>{
+      const st = breachStatus(b);
+      html += `
+        <div class="hitl-item">
+          <div class="top">
+            <b>${escapeHtml(b.title)}</b>
+            <span class="breach-timer ${st.cls}">${st.label}</span>
+          </div>
+          <div class="desc">${escapeHtml(b.description)}</div>
+          <div class="meta">Detectado: ${fmtDate(b.detectedAt)} · Categorías afectadas: ${escapeHtml(b.categories||'—')} · Afectados aprox.: ${b.affected||'—'} · Datos sensibles/NNA: ${b.sensitive?'Sí — requiere notificación directa a titulares':'No'}</div>
+          <div class="btn-row">
+            ${!b.apdpNotified?`<button class="btn approve" onclick="requestBreachNotify('${b.id}')">Marcar notificada a APDP (HITL)</button>`:'<span class="pill green">Notificada a APDP</span>'}
+          </div>
+        </div>`;
+    });
+  }
+  html += `</div></div>`;
+  c.innerHTML = html;
+}
+function openBreachForm(){
+  openModal('Reportar incidente de seguridad', `
+    <div class="field"><label class="field-lbl">Título del incidente</label><input id="bf-title" placeholder="Ej: Acceso no autorizado a base de clientes"></div>
+    <div class="field"><label class="field-lbl">Descripción</label><textarea id="bf-desc" rows="2" placeholder="Naturaleza de la vulneración: alteración, filtración, pérdida, destrucción o acceso no autorizado"></textarea></div>
+    <div class="row2">
+      <div class="field"><label class="field-lbl">Categorías de datos afectadas</label><input id="bf-cat" placeholder="Ej: nombre, email, RUT"></div>
+      <div class="field"><label class="field-lbl">N° aproximado de afectados</label><input id="bf-affected" type="number" placeholder="Ej: 1200"></div>
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin-top:4px">
+      <input type="checkbox" id="bf-sensitive" style="width:auto;accent-color:var(--red)"> Afecta datos sensibles y/o de NNA menores de 14 años (requiere notificación directa a titulares)
+    </label>
+  `, `<button class="btn" onclick="closeModal()">Cancelar</button><button class="btn reject" onclick="saveBreach()">Registrar incidente</button>`);
+}
+async function saveBreach(){
+  const title = document.getElementById('bf-title').value.trim();
+  if(!title) return;
+  const b = {
+    id: uid('b'), title, description: document.getElementById('bf-desc').value.trim(),
+    categories: document.getElementById('bf-cat').value.trim(),
+    affected: document.getElementById('bf-affected').value,
+    sensitive: document.getElementById('bf-sensitive').checked,
+    detectedAt: new Date().toISOString(), apdpNotified:false,
+  };
+  state.breaches.push(b);
+  await appendAudit('usuario','Brechas',`Incidente registrado: "${b.title}" — reloj de 72h iniciado`,'aprobado', b.id, 'breaches');
+  await saveState(); closeModal(); render();
+  showToast('Incidente registrado', 'Reloj de notificación de 72h iniciado');
+}
+function requestBreachNotify(id){
+  const b = state.breaches.find(x=>x.id===id);
+  requestHitl('breaches', 'notificacion', `Confirmar notificación a la APDP del incidente: "${b.title}"`, id, 'usuario', {onApprove:'breach_notify', breachId:id});
+  saveState(); render();
+  showToast('Enviado a HITL', 'Confirmación humana requerida antes de cerrar el reporte');
+}
+
+/* ============================================================
+   5. DERECHOS ARCO+
+============================================================ */
+function renderArco(){
+  const c = document.getElementById('content');
+  let html = `
+    <div class="panel">
+      <div class="panel-head">
+        <span class="name">Solicitudes de titulares (${state.arco.length})</span>
+        <button class="btn primary" onclick="openArcoForm()">+ NUEVA SOLICITUD</button>
+      </div>
+      <div class="panel-body">
+  `;
+  if(!state.arco.length){ html += `<div class="empty">SIN SOLICITUDES REGISTRADAS. Plazo legal de respuesta: 30 días corridos, prorrogables por 30 más (Arts. 5° a 9°, 10 y 11).</div>`; }
+  else{
+    html += `<table><thead><tr><th>Titular</th><th>Derecho</th><th>Ingresada</th><th>Vence</th><th>Estado</th><th></th></tr></thead><tbody>`;
+    state.arco.forEach(r=>{
+      const due = daysUntil(r.dueDate);
+      html += `<tr>
+        <td>${escapeHtml(r.titular)}</td>
+        <td><span class="pill purple">${r.right}</span></td>
+        <td class="mono">${r.receivedDate}</td>
+        <td class="mono" style="color:${due<0?'var(--red)':due<=7?'var(--amber)':'var(--text-dim)'}">${r.dueDate}${due<0?' (vencida)':''}</td>
+        <td><span class="pill ${r.status==='resuelto'?'green':r.status==='revision'?'amber':'grey'}">${r.status}</span></td>
+        <td>${r.status!=='resuelto'?`<button class="btn approve" onclick="requestArcoResolve('${r.id}')">Resolver (HITL)</button>`:''}</td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+  }
+  html += `</div></div>`;
+  c.innerHTML = html;
+}
+function openArcoForm(){
+  const today = new Date(); const due = new Date(); due.setDate(due.getDate()+30);
+  openModal('Nueva solicitud ARCO+', `
+    <div class="row2">
+      <div class="field"><label class="field-lbl">Titular (nombre o identificador)</label><input id="af-titular" placeholder="Ej: Juan Pérez / cliente_4821"></div>
+      <div class="field"><label class="field-lbl">Derecho ejercido</label>
+        <select id="af-right"><option>Acceso</option><option>Rectificación</option><option>Supresión</option><option>Oposición</option><option>Portabilidad</option><option>Bloqueo</option></select>
+      </div>
+    </div>
+    <div class="field"><label class="field-lbl">Detalle de la solicitud</label><textarea id="af-detail" rows="2"></textarea></div>
+    <div class="row2">
+      <div class="field"><label class="field-lbl">Fecha de ingreso</label><input type="date" id="af-received" value="${today.toISOString().slice(0,10)}"></div>
+      <div class="field"><label class="field-lbl">Vence (30 días corridos)</label><input type="date" id="af-due" value="${due.toISOString().slice(0,10)}"></div>
+    </div>
+  `, `<button class="btn" onclick="closeModal()">Cancelar</button><button class="btn primary" onclick="saveArco()">Registrar solicitud</button>`);
+}
+async function saveArco(){
+  const titular = document.getElementById('af-titular').value.trim();
+  if(!titular) return;
+  const r = {
+    id: uid('a'), titular, right: document.getElementById('af-right').value,
+    detail: document.getElementById('af-detail').value.trim(),
+    receivedDate: document.getElementById('af-received').value,
+    dueDate: document.getElementById('af-due').value,
+    status: 'pendiente',
+  };
+  state.arco.push(r);
+  await appendAudit('usuario','ARCO+',`Solicitud de ${r.right} registrada — titular: ${r.titular}`,'aprobado', r.id, 'arco');
+  await saveState(); closeModal(); render();
+  showToast('Solicitud registrada', `${r.right} — vence ${r.dueDate}`);
+}
+function requestArcoResolve(id){
+  const r = state.arco.find(x=>x.id===id);
+  requestHitl('arco', 'resolucion', `Marcar como resuelta la solicitud de ${r.right} de ${r.titular}`, id, 'usuario', {onApprove:'arco_status', reqId:id, newStatus:'resuelto'});
+  saveState(); render();
+  showToast('Enviado a HITL', 'Requiere confirmación humana antes de cerrar la solicitud');
+}
+
+/* ============================================================
+   6. CONTRATOS / DPA
+============================================================ */
+function renderContracts(){
+  const c = document.getElementById('content');
+  let html = `
+    <div class="panel">
+      <div class="panel-head">
+        <span class="name">Encargados de tratamiento y transferencias internacionales (${state.contracts.length})</span>
+        <button class="btn primary" onclick="openContractForm()">+ NUEVO CONTRATO</button>
+      </div>
+      <div class="panel-body">
+  `;
+  if(!state.contracts.length){ html += `<div class="empty">SIN CONTRATOS REGISTRADOS. Todo encargado de tratamiento (proveedor, cloud, IA) requiere DPA; toda transferencia internacional requiere garantías equivalentes (Arts. 15, 15 bis).</div>`; }
+  else{
+    html += `<table><thead><tr><th>Proveedor</th><th>Tipo</th><th>País destino</th><th>Garantía transferencia</th><th>Estado</th><th></th></tr></thead><tbody>`;
+    state.contracts.forEach(ct=>{
+      html += `<tr>
+        <td><b>${escapeHtml(ct.provider)}</b></td>
+        <td><span class="pill blue">${ct.type}</span></td>
+        <td class="mono">${ct.country||'Chile'}</td>
+        <td>${ct.international?`<span class="pill amber">${ct.safeguard}</span>`:'<span class="pill grey">N/A</span>'}</td>
+        <td><span class="pill ${ct.status==='vigente'?'green':ct.status==='revision'?'amber':'grey'}">${ct.status}</span></td>
+        <td>${ct.status!=='vigente'?`<button class="btn approve" onclick="requestContractSign('${ct.id}')">Confirmar vigencia (HITL)</button>`:''}</td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+  }
+  html += `</div></div>`;
+  c.innerHTML = html;
+}
+function openContractForm(){
+  openModal('Nuevo contrato / DPA', `
+    <div class="row2">
+      <div class="field"><label class="field-lbl">Proveedor / encargado</label><input id="cf-provider" placeholder="Ej: Cloud Provider Inc."></div>
+      <div class="field"><label class="field-lbl">Tipo</label><select id="cf-type"><option>DPA</option><option>Cláusula de confidencialidad</option><option>Acuerdo de subencargo</option></select></div>
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin:6px 0">
+      <input type="checkbox" id="cf-intl" style="width:auto;accent-color:var(--amber)" onchange="document.getElementById('cf-intl-fields').style.display=this.checked?'grid':'none'"> Implica transferencia internacional de datos
+    </label>
+    <div class="row2" id="cf-intl-fields" style="display:none">
+      <div class="field"><label class="field-lbl">País de destino</label><input id="cf-country" placeholder="Ej: Estados Unidos"></div>
+      <div class="field"><label class="field-lbl">Garantía aplicada</label><select id="cf-safeguard"><option>Cláusulas contractuales tipo</option><option>Normas corporativas vinculantes</option><option>Decisión de adecuación</option><option>Consentimiento explícito del titular</option></select></div>
+    </div>
+  `, `<button class="btn" onclick="closeModal()">Cancelar</button><button class="btn primary" onclick="saveContract()">Guardar contrato</button>`);
+}
+async function saveContract(){
+  const provider = document.getElementById('cf-provider').value.trim();
+  if(!provider) return;
+  const intl = document.getElementById('cf-intl').checked;
+  const ct = {
+    id: uid('c'), provider, type: document.getElementById('cf-type').value,
+    international: intl,
+    country: intl ? document.getElementById('cf-country').value.trim() : 'Chile',
+    safeguard: intl ? document.getElementById('cf-safeguard').value : null,
+    status: 'revision',
+  };
+  state.contracts.push(ct);
+  await appendAudit('usuario','Contratos',`Contrato/DPA registrado con ${ct.provider}${intl?' — transferencia internacional a '+ct.country:''}`,'aprobado', ct.id, 'contracts');
+  await saveState(); closeModal(); render();
+  showToast('Contrato registrado', provider);
+}
+function requestContractSign(id){
+  const ct = state.contracts.find(x=>x.id===id);
+  requestHitl('contracts', 'vigencia', `Confirmar vigencia del contrato/DPA con ${ct.provider}`, id, 'usuario', {onApprove:'contract_sign', contractId:id});
+  saveState(); render();
+  showToast('Enviado a HITL', 'Requiere confirmación humana antes de marcar vigente');
+}
+
+/* ============================================================
+   HITL — panel transversal
+============================================================ */
+function renderHitl(){
+  const c = document.getElementById('content');
+  let html = `<div class="panel"><div class="panel-head"><span class="name">Cola pendiente (${state.hitlQueue.length})</span></div><div class="panel-body">`;
+  if(!state.hitlQueue.length){ html += `<div class="empty">SIN SOLICITUDES PENDIENTES DE APROBACIÓN HUMANA</div>`; }
+  else{
+    state.hitlQueue.forEach(item=>{
+      html += `
+        <div class="hitl-item">
+          <div class="top"><span class="pill purple">${item.module}</span><span class="mono" style="color:var(--text-dimmer);font-size:9.5px">${fmtDate(item.createdAt)}</span></div>
+          <div class="desc">${escapeHtml(item.description)}</div>
+          <div class="meta">Solicitado por: ${item.requestedBy}</div>
+          <div class="btn-row">
+            <button class="btn approve" onclick="resolveHitl('${item.id}','aprobado')">APROBAR</button>
+            <button class="btn reject" onclick="resolveHitl('${item.id}','rechazado')">RECHAZAR</button>
+          </div>
+        </div>`;
+    });
+  }
+  html += `</div></div>`;
+  c.innerHTML = html;
+}
+
+/* ============================================================
+   REGISTRO DE AUDITORÍA
+============================================================ */
+function renderAudit(){
+  const c = document.getElementById('content');
+  let html = `
+    <div class="panel">
+      <div class="panel-head">
+        <span class="name">Cadena de trazabilidad (${state.auditLog.length} entradas)</span>
+        <button class="btn" onclick="exportAudit()">EXPORTAR JSON</button>
+      </div>
+      <div class="panel-body">
+        <table><thead><tr><th>Seq</th><th>Fecha</th><th>Área</th><th>Actor</th><th>Descripción</th><th>Estado</th><th>Hash</th></tr></thead><tbody>
+  `;
+  if(!state.auditLog.length){ html += `<tr><td colspan="7" class="empty">SIN REGISTROS</td></tr>`; }
+  [...state.auditLog].reverse().forEach(e=>{
+    html += `<tr>
+      <td class="mono">${e.seq}</td>
+      <td class="mono">${fmtDate(e.timestamp)}</td>
+      <td><span class="pill blue">${e.area}</span></td>
+      <td class="mono">${e.actor}</td>
+      <td>${escapeHtml(e.description)}</td>
+      <td><span class="pill ${e.resolution==='aprobado'?'green':e.resolution==='rechazado'?'red':'grey'}">${e.resolution}</span></td>
+      <td class="hash-tag" title="${e.hash}">${e.hash.slice(0,14)}…</td>
+    </tr>`;
+  });
+  html += `</tbody></table></div></div>`;
+  c.innerHTML = html;
+}
+function exportAudit(){
+  const payload = {
+    exportado: new Date().toISOString(),
+    proposito: 'Evidencia operativa de trazabilidad para acreditar licitud y accountability ante la Agencia de Protección de Datos Personales (APDP), Ley 21.719.',
+    integridad: 'Cadena hash SHA-256 encadenada; cualquier alteración retroactiva rompe la cadena.',
+    totalEntradas: state.auditLog.length,
+    entradas: state.auditLog,
+  };
+  downloadJSON(payload, `auditoria-vibenorma-${todayStr()}.json`);
+}
+function downloadJSON(obj, filename){
+  const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+document.getElementById('exportAllBtn').addEventListener('click', ()=>{
+  downloadJSON({
+    exportado: new Date().toISOString(),
+    sistema: 'VibeNORMA Compliance — Ley 21.719',
+    proposito: 'Expediente completo del modelo de prevención de infracciones para certificación/acreditación ante la APDP (Art. 48–50).',
+    preparacionGlobal: globalReadiness()+'%',
+    rat: state.rat, dpd: state.dpd, eipd: state.eipd, breaches: state.breaches, arco: state.arco, contracts: state.contracts,
+    hitlPendientes: state.hitlQueue, auditoria: state.auditLog,
+  }, `expediente-vibenorma-${todayStr()}.json`);
+});
+
+loadState();
+</script>
+
+
+<div id="flonnect-my-app"></div></body></html>

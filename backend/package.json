@@ -1,0 +1,16 @@
+{
+  "name": "vibenos-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "pdf-parse": "^1.1.1",
+    "dotenv": "^16.0.0"
+  }
+}

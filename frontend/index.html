@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VibeOS — VibeCodingChile</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+ --bg:#080c10; --bg2:#0d1117; --bg3:#111820; --bg4:#0a0e13;
+ --border:#1e2d3d; --border2:#2a3d52;
+ --accent:#c8f065; --accent2:#00ff88; --accent3:#ff6b35;
+ --accent4:#a855f7; --accent5:#C9A84C;
+ --text:#c9d1d9; --text2:#8b949e; --text3:#495e72;
+ --danger:#ff4757; --warn:#ffa502; --success:#00ff88;
+ --glow:0 0 20px rgba(200,240,101,0.2);
+ --glow2:0 0 30px rgba(200,240,101,0.35);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px)}
+
+/* ═══ BOOT SCREEN ═══ */
+#boot{position:fixed;inset:0;background:#000;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Space Mono',monospace}
+#boot .logo-ascii{color:var(--accent);font-size:11px;line-height:1.3;text-align:center;white-space:pre;margin-bottom:32px;animation:glitch 3s infinite}
+@keyframes glitch{0%,90%,100%{text-shadow:0 0 20px rgba(200,240,101,0.8)}91%{text-shadow:-2px 0 #ff4757,2px 0 #00ff88}93%{text-shadow:2px 0 #ff4757,-2px 0 #00ff88}95%{text-shadow:none}}
+#boot .boot-line{color:var(--text2);font-size:11px;margin-bottom:6px;opacity:0;animation:bootIn 0.3s forwards}
+@keyframes bootIn{to{opacity:1}}
+#boot .progress-bar{width:280px;height:3px;background:#111;border-radius:2px;margin-top:24px;overflow:hidden}
+#boot .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;width:0;transition:width 0.3s ease}
+
+/* ═══ DESKTOP ═══ */
+#desktop{width:100%;height:100%;position:relative;overflow:hidden;display:none}
+.wallpaper{position:absolute;inset:0;background:radial-gradient(ellipse at 15% 15%,rgba(200,240,101,0.06) 0%,transparent 45%),radial-gradient(ellipse at 85% 85%,rgba(168,85,247,0.07) 0%,transparent 45%),radial-gradient(ellipse at 50% 50%,rgba(0,255,136,0.03) 0%,transparent 65%),var(--bg);z-index:0}
+.grid-overlay{position:absolute;inset:0;background-image:linear-gradient(rgba(200,240,101,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(200,240,101,0.02) 1px,transparent 1px);background-size:40px 40px;z-index:1;pointer-events:none}
+
+/* ═══ TASKBAR ═══ */
+#taskbar{position:fixed;top:0;left:0;right:0;height:38px;background:rgba(8,12,16,0.92);border-bottom:1px solid var(--border);backdrop-filter:blur(16px);z-index:5000;display:flex;align-items:center;padding:0 14px;gap:10px}
+.taskbar-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:var(--accent);letter-spacing:-0.02em;margin-right:6px;cursor:pointer}
+.taskbar-sep{width:1px;height:18px;background:var(--border)}
+.taskbar-apps{display:flex;gap:4px;flex:1;overflow:hidden}
+.taskbar-btn{display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:5px;cursor:pointer;font-size:11px;color:var(--text2);transition:all .15s;border:1px solid transparent;white-space:nowrap;font-family:'Space Mono',monospace;background:transparent}
+.taskbar-btn:hover{background:rgba(200,240,101,0.06);color:var(--text);border-color:var(--border)}
+.taskbar-btn.active{background:rgba(200,240,101,0.1);color:var(--accent);border-color:rgba(200,240,101,0.2)}
+.taskbar-btn .dot{width:5px;height:5px;border-radius:50%;background:var(--accent2);flex-shrink:0}
+.taskbar-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+#clock{font-family:'Space Mono',monospace;font-size:11px;color:var(--text2);white-space:nowrap}
+#status-bar{display:flex;align-items:center;gap:6px}
+.status-pill{padding:2px 8px;border-radius:10px;font-size:9px;font-family:'Space Mono',monospace;font-weight:700;letter-spacing:0.08em}
+.pill-green{background:rgba(0,255,136,0.12);color:var(--accent2);border:1px solid rgba(0,255,136,0.2)}
+.pill-yellow{background:rgba(200,240,101,0.12);color:var(--accent);border:1px solid rgba(200,240,101,0.2)}
+
+/* ═══ DOCK ═══ */
+#dock{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(8,12,16,0.88);border:1px solid var(--border);border-radius:16px;backdrop-filter:blur(20px);padding:8px 12px;display:flex;gap:8px;z-index:5000;box-shadow:0 8px 40px rgba(0,0,0,0.5)}
+.dock-icon{width:44px;height:44px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;position:relative;border:1px solid transparent;font-size:20px;gap:2px}
+.dock-icon:hover{transform:translateY(-6px) scale(1.1);border-color:var(--border2);background:rgba(255,255,255,0.05)}
+.dock-icon.open::after{content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--accent2)}
+.dock-label{font-size:8px;color:var(--text3);font-family:'Space Mono',monospace;letter-spacing:0.04em;display:none}
+.dock-icon:hover .dock-label{display:block}
+.dock-sep{width:1px;height:36px;background:var(--border);align-self:center;margin:0 2px}
+
+/* ═══ WINDOWS ═══ */
+.win{position:fixed;background:var(--bg2);border:1px solid var(--border);border-radius:12px;box-shadow:0 24px 80px rgba(0,0,0,0.7);z-index:1000;overflow:hidden;display:none;flex-direction:column;min-width:320px;min-height:200px;resize:both}
+.win.visible{display:flex}
+.win.focused{border-color:var(--border2);box-shadow:0 24px 80px rgba(0,0,0,0.8),0 0 0 1px rgba(200,240,101,0.1)}
+.win-titlebar{height:36px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:8px;cursor:grab;flex-shrink:0;user-select:none}
+.win-titlebar:active{cursor:grabbing}
+.win-controls{display:flex;gap:6px}
+.win-ctrl{width:12px;height:12px;border-radius:50%;cursor:pointer;transition:filter .15s;border:none;padding:0}
+.win-ctrl:hover{filter:brightness(1.3)}
+.wc-close{background:#ff5f57}
+.wc-min{background:#febc2e}
+.wc-max{background:#28c840}
+.win-title{font-family:'Space Mono',monospace;font-size:11px;color:var(--text2);margin-left:8px;flex:1;text-align:center}
+.win-body{flex:1;overflow:hidden}
+
+/* ═══ APP — LEGALIZES ═══ */
+#win-legalizes{width:1100px;height:720px;top:60px;left:80px}
+.leg-shell{display:flex;height:100%;background:#0A0B0F}
+.leg-sidebar{width:200px;background:#0E0F14;border-right:1px solid #1E2028;display:flex;flex-direction:column;flex-shrink:0}
+.leg-logo{padding:18px 16px 14px;border-bottom:1px solid #1E2028;display:flex;align-items:center;gap:10px}
+.leg-logo-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#C9A84C,#8B6E2E);display:flex;align-items:center;justify-content:center;font-size:14px}
+.leg-logo-text{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:#E8E9EF}
+.leg-nav{flex:1;padding:10px 8px;overflow-y:auto}
+.leg-nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;transition:all .15s;color:#6B7080;font-size:13px;font-weight:500;border:1px solid transparent;margin-bottom:2px}
+.leg-nav-item:hover{background:#161820;color:#E8E9EF;border-color:#1E2028}
+.leg-nav-item.active{background:rgba(201,168,76,0.12);color:#E4C57A;border-color:rgba(201,168,76,0.2)}
+.leg-nav-icon{font-size:15px}
+.leg-user{padding:12px 12px;border-top:1px solid #1E2028;display:flex;align-items:center;gap:9px}
+.leg-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#C9A84C,#8B6E2E);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#0A0B0F;flex-shrink:0}
+.leg-user-info{flex:1;min-width:0}
+.leg-user-name{font-size:12px;font-weight:600;color:#E8E9EF;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.leg-user-role{font-size:10px;color:#6B7080}
+.leg-main{flex:1;overflow-y:auto;background:#0A0B0F}
+.leg-page{display:none;padding:24px}
+.leg-page.active{display:block}
+
+/* Dashboard */
+.leg-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.leg-stat{background:#111318;border:1px solid #1E2028;border-radius:10px;padding:16px;transition:all .2s}
+.leg-stat:hover{border-color:rgba(201,168,76,0.25);box-shadow:0 4px 20px rgba(201,168,76,0.08)}
+.leg-stat-val{font-family:'DM Mono',monospace;font-size:26px;font-weight:700;color:#C9A84C;margin-bottom:4px}
+.leg-stat-lbl{font-size:11px;color:#6B7080;font-weight:500}
+.leg-section-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#E8E9EF;margin-bottom:14px}
+.leg-card{background:#111318;border:1px solid #1E2028;border-radius:10px;padding:18px;margin-bottom:14px}
+
+/* Chat */
+.leg-chat-layout{display:flex;height:calc(100% - 0px);flex-direction:column}
+.leg-chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.leg-msg-ai{background:#111318;border:1px solid #1E2028;border-radius:12px 12px 12px 2px;padding:12px 15px;max-width:80%;font-size:13px;line-height:1.7;color:#E8E9EF}
+.leg-msg-user{background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.25);border-radius:12px 12px 2px 12px;padding:12px 15px;max-width:75%;margin-left:auto;font-size:13px;color:#E4C57A}
+.leg-chat-input-area{padding:14px;border-top:1px solid #1E2028;display:flex;gap:10px}
+.leg-input{flex:1;background:#0E0F14;border:1px solid #1E2028;color:#E8E9EF;padding:10px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:all .2s}
+.leg-input:focus{border-color:rgba(201,168,76,0.4);box-shadow:0 0 0 3px rgba(201,168,76,0.08)}
+.leg-send{background:linear-gradient(135deg,#C9A84C,#8B6E2E);color:#0A0B0F;border:none;padding:10px 18px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s}
+.leg-send:hover{filter:brightness(1.1)}
+.leg-typing{display:flex;align-items:center;gap:6px;padding:10px 14px;background:#111318;border:1px solid #1E2028;border-radius:12px;width:fit-content;font-size:12px;color:#6B7080}
+.typing-dot{width:5px;height:5px;border-radius:50%;background:#C9A84C;display:inline-block;animation:tdot 1.2s infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes tdot{0%,100%{opacity:1}50%{opacity:.2}}
+.leg-suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px 0}
+.leg-sug{padding:5px 11px;background:#111318;border:1px solid #1E2028;border-radius:20px;font-size:11px;color:#9299A8;cursor:pointer;transition:all .15s}
+.leg-sug:hover{border-color:rgba(201,168,76,0.3);color:#E4C57A;background:rgba(201,168,76,0.08)}
+
+/* ═══ APP — AGENTE OS ═══ */
+#win-agentOS{width:1050px;height:680px;top:70px;left:120px}
+.os-shell{display:flex;height:100%;font-family:'Space Mono',monospace}
+.os-sidebar{width:200px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.os-logo-area{padding:12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.os-logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:16px}
+.os-logo-txt{font-family:'Syne',sans-serif;font-weight:800;font-size:11px;color:var(--accent);line-height:1.2}
+.os-nav{flex:1;padding:8px 0;overflow-y:auto}
+.os-nav-sec{padding:6px 14px 3px;font-size:8px;color:var(--text3);letter-spacing:2px;text-transform:uppercase}
+.os-nav-item{display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;font-size:11px;color:var(--text2);transition:all .15s;border-left:2px solid transparent}
+.os-nav-item:hover{background:rgba(200,240,101,0.04);color:var(--text)}
+.os-nav-item.active{background:rgba(200,240,101,0.08);color:var(--accent);border-left-color:var(--accent)}
+.os-nav-badge{margin-left:auto;background:var(--accent);color:var(--bg);border-radius:10px;padding:1px 5px;font-size:8px;font-weight:700}
+.os-nav-badge.g{background:var(--accent2)}
+.os-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.os-topbar{height:44px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0}
+.os-page-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:#fff}
+.os-page-sub{font-size:10px;color:var(--text3)}
+.os-content{flex:1;overflow-y:auto;padding:16px}
+.os-content::-webkit-scrollbar{width:4px}
+.os-content::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.os-page{display:none}
+.os-page.active{display:block}
+.os-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.os-stat{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px;position:relative;overflow:hidden;transition:border-color .2s}
+.os-stat:hover{border-color:var(--accent)}
+.os-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.os-stat.lime::before{background:var(--accent)}
+.os-stat.green::before{background:var(--accent2)}
+.os-stat.orange::before{background:var(--accent3)}
+.os-stat.purple::before{background:var(--accent4)}
+.os-stat-lbl{font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.os-stat-val{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;color:#fff}
+.os-stat-val.lime{color:var(--accent)}
+.os-stat-val.green{color:var(--accent2)}
+.os-stat-val.orange{color:var(--accent3)}
+.os-stat-val.purple{color:var(--accent4)}
+.os-stat-sub{font-size:9px;color:var(--text3);margin-top:3px}
+.os-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.os-card-hdr{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.os-card-ttl{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:#fff}
+.os-card-body{padding:14px}
+.os-agent-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:all .15s}
+.os-agent-row:hover{padding-left:4px}
+.os-agent-row:last-child{border-bottom:none}
+.os-agent-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.os-agent-name{font-size:12px;font-weight:700;color:var(--text)}
+.os-agent-desc{font-size:10px;color:var(--text3);margin-top:1px}
+.os-badge{padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:.05em}
+.os-badge-green{background:rgba(0,255,136,0.12);color:var(--accent2);border:1px solid rgba(0,255,136,0.2)}
+.os-badge-yellow{background:rgba(200,240,101,0.12);color:var(--accent);border:1px solid rgba(200,240,101,0.2)}
+.os-badge-red{background:rgba(255,71,87,0.12);color:var(--danger);border:1px solid rgba(255,71,87,0.2)}
+.os-btn{padding:6px 12px;border-radius:5px;font-size:10px;font-family:'Space Mono',monospace;cursor:pointer;border:1px solid;transition:all .15s;font-weight:700}
+.os-btn-primary{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.os-btn-primary:hover{box-shadow:var(--glow)}
+.os-btn-ghost{background:transparent;color:var(--text2);border-color:var(--border)}
+.os-btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.pulse-dot{width:6px;height:6px;border-radius:50%;background:var(--accent2);display:inline-block;animation:pdot 2s infinite}
+@keyframes pdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+/* ═══ APP — WIZARD ═══ */
+#win-wizard{width:860px;height:680px;top:80px;left:160px}
+.wiz-shell{height:100%;background:#060608;overflow-y:auto;padding:28px;font-family:'DM Sans',sans-serif}
+.wiz-step-bar{display:flex;align-items:center;margin-bottom:32px}
+.wiz-step{display:flex;align-items:center;flex:1}
+.wiz-step-circle{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;transition:all .3s;border:2px solid #1A1D28;background:#0D0E14;color:#5A6080}
+.wiz-step-circle.done{background:#00E5A0;border-color:#00E5A0;color:#060608}
+.wiz-step-circle.current{background:rgba(0,229,160,0.12);border-color:#00E5A0;color:#00E5A0;box-shadow:0 0 0 4px rgba(0,229,160,0.12)}
+.wiz-step-line{flex:1;height:2px;background:#1A1D28;transition:background .5s;margin:0 4px}
+.wiz-step-line.done{background:#00E5A0}
+.wiz-card{background:#0D0E14;border:1px solid #1A1D28;border-radius:12px;padding:24px;margin-bottom:16px}
+.wiz-title{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#E8EAF2;margin-bottom:8px}
+.wiz-subtitle{font-size:13px;color:#8890AA;line-height:1.6;margin-bottom:20px}
+.wiz-label{font-size:11px;color:#5A6080;margin-bottom:8px;display:block;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.wiz-input{background:#12141C;border:1.5px solid #1A1D28;color:#E8EAF2;padding:11px 14px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:all .2s;width:100%;margin-bottom:14px}
+.wiz-input:focus{border-color:rgba(0,229,160,0.4);box-shadow:0 0 0 3px rgba(0,229,160,0.08)}
+.wiz-select{background:#12141C;border:1.5px solid #1A1D28;color:#E8EAF2;padding:11px 14px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;width:100%;cursor:pointer;margin-bottom:14px;appearance:none}
+.wiz-option{background:#0D0E14;border:1.5px solid #1A1D28;border-radius:10px;padding:14px 16px;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:12px;margin-bottom:8px}
+.wiz-option:hover{border-color:#252840;background:#12141C}
+.wiz-option.sel{border-color:#00E5A0;background:rgba(0,229,160,0.08)}
+.wiz-option.sel-red{border-color:#FF5C7A;background:rgba(255,92,122,0.08)}
+.wiz-check-row{display:flex;gap:8px;margin-bottom:6px}
+.wiz-check-btn{flex:1;padding:9px 12px;background:#12141C;border:1.5px solid #1A1D28;border-radius:8px;color:#8890AA;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.wiz-check-btn:hover{border-color:#252840;color:#E8EAF2}
+.wiz-check-btn.yes{border-color:#00E5A0;color:#00E5A0;background:rgba(0,229,160,0.08)}
+.wiz-check-btn.partial{border-color:#FFD166;color:#FFD166;background:rgba(255,209,102,0.08)}
+.wiz-check-btn.no{border-color:#FF5C7A;color:#FF5C7A;background:rgba(255,92,122,0.08)}
+.wiz-btn-row{display:flex;gap:10px;margin-top:20px}
+.wiz-btn-green{background:linear-gradient(135deg,#00E5A0,#00A070);color:#060608;border:none;padding:12px 26px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s}
+.wiz-btn-green:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.wiz-btn-ghost{background:transparent;color:#8890AA;border:1px solid #1A1D28;padding:11px 22px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:500;font-size:14px;cursor:pointer;transition:all .2s}
+.wiz-btn-ghost:hover{border-color:#252840;color:#E8EAF2}
+.risk-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.risk-ok{background:rgba(0,229,160,0.12);color:#00E5A0;border:1px solid rgba(0,229,160,0.2)}
+.risk-warn{background:rgba(255,209,102,0.12);color:#FFD166;border:1px solid rgba(255,209,102,0.2)}
+.risk-high{background:rgba(255,92,122,0.12);color:#FF5C7A;border:1px solid rgba(255,92,122,0.2)}
+.progress-track{height:8px;background:#1A1D28;border-radius:4px;overflow:hidden;margin:8px 0}
+.progress-fill{height:100%;border-radius:4px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+
+/* ═══ APP — AGENTE LEGAL ═══ */
+#win-agente{width:950px;height:660px;top:80px;left:100px}
+.al-shell{display:flex;flex-direction:column;height:100%;background:#F4F7FB;font-family:'DM Sans',sans-serif}
+.al-nav{background:#0B2B5C;display:flex;align-items:center;height:52px;padding:0 16px;gap:0}
+.al-brand{font-family:'Syne',sans-serif;color:#fff;font-size:13px;font-weight:700;margin-right:20px}
+.al-tab{padding:.4rem .9rem;color:rgba(255,255,255,.65);font-size:12px;font-weight:500;cursor:pointer;border-radius:3px;transition:all .15s;white-space:nowrap;border:none;background:none;font-family:'DM Sans',sans-serif}
+.al-tab:hover{color:#fff;background:rgba(255,255,255,.08)}
+.al-tab.active{color:#fff;background:rgba(255,255,255,.16);font-weight:600}
+.al-panel{display:none;flex:1;flex-direction:column;overflow:hidden;min-height:0}
+.al-panel.active{display:flex}
+.al-layout{display:grid;grid-template-columns:240px 1fr;flex:1;overflow:hidden;min-height:0}
+.al-sidebar{background:#fff;border-right:1px solid #B8D0EE;display:flex;flex-direction:column;overflow-y:auto}
+.al-sb-sec{padding:.9rem .9rem .3rem;border-bottom:1px solid #EBF2FB}
+.al-sb-ttl{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#90A4BE;font-weight:600;margin-bottom:.5rem}
+.al-norm-item{display:flex;align-items:flex-start;gap:6px;padding:.4rem .35rem;border-radius:4px;cursor:pointer;transition:background .13s;margin-bottom:2px}
+.al-norm-item:hover{background:#EBF2FB}
+.al-norm-dot{width:6px;height:6px;border-radius:50%;background:#2D6FBF;margin-top:6px;flex-shrink:0}
+.al-norm-lbl{font-size:12px;color:#0B2B5C;line-height:1.4;font-weight:500}
+.al-qbtn{display:block;width:100%;text-align:left;background:#EBF2FB;border:1px solid #B8D0EE;color:#0B2B5C;padding:.45rem .7rem;border-radius:4px;font-size:12px;cursor:pointer;margin-bottom:.35rem;font-family:inherit;transition:all .13s;line-height:1.4}
+.al-qbtn:hover{background:#2D6FBF;color:#fff;border-color:#2D6FBF}
+.al-chat-main{display:flex;flex-direction:column;overflow:hidden;background:#F4F7FB;min-height:0}
+.al-msgs{flex:1;overflow-y:auto;padding:1.2rem;display:flex;flex-direction:column;gap:1rem}
+.al-msg-row{display:flex;gap:8px;max-width:720px}
+.al-msg-row.user{flex-direction:row-reverse;align-self:flex-end}
+.al-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.al-av-bot{background:#0B2B5C;color:#fff}
+.al-av-user{background:#2D6FBF;color:#fff}
+.al-bubble{padding:.8rem 1rem;font-size:13px;line-height:1.7;max-width:600px;box-shadow:0 2px 8px rgba(11,43,92,.06)}
+.al-bubble-bot{background:#fff;border:1px solid #B8D0EE;border-left:3px solid #0B2B5C}
+.al-bubble-user{background:#2D6FBF;color:#fff}
+.al-input-area{padding:12px;border-top:1px solid #B8D0EE;display:flex;gap:10px;background:#fff}
+.al-input{flex:1;border:1px solid #B8D0EE;background:#F4F7FB;color:#0B2B5C;padding:9px 13px;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:all .2s}
+.al-input:focus{border-color:#2D6FBF;box-shadow:0 0 0 3px rgba(45,111,191,.1)}
+.al-send{background:#0B2B5C;color:#fff;border:none;padding:9px 18px;border-radius:4px;font-weight:600;font-size:13px;cursor:pointer;transition:all .2s}
+.al-send:hover{background:#1A4A8A}
+
+/* ═══ APP — ANONIMIZADOR ═══ */
+#win-anon{width:900px;height:650px;top:90px;left:140px}
+.anon-shell{display:flex;flex-direction:column;height:100%;background:#F4F7FB;font-family:'DM Sans',sans-serif;overflow-y:auto}
+.anon-nav{background:#0B2B5C;padding:14px 20px;display:flex;align-items:center;gap:14px;flex-shrink:0}
+.anon-title{font-family:'Syne',sans-serif;color:#fff;font-size:15px;font-weight:700}
+.anon-badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(201,168,76,0.2);color:#C9A84C;border:1px solid rgba(201,168,76,0.3)}
+.anon-body{padding:20px;flex:1}
+.anon-upload{border:2px dashed #B8D0EE;border-radius:8px;padding:40px;text-align:center;background:#fff;cursor:pointer;transition:all .2s;margin-bottom:20px}
+.anon-upload:hover{border-color:#2D6FBF;background:#EBF2FB}
+.anon-upload-icon{font-size:40px;margin-bottom:12px}
+.anon-upload-text{font-size:14px;color:#0B2B5C;font-weight:600;margin-bottom:4px}
+.anon-upload-sub{font-size:12px;color:#90A4BE}
+.anon-textarea{width:100%;height:160px;border:1px solid #B8D0EE;border-radius:8px;padding:14px;font-family:'DM Mono',monospace;font-size:12px;color:#0B2B5C;background:#fff;resize:vertical;outline:none;transition:all .2s}
+.anon-textarea:focus{border-color:#2D6FBF;box-shadow:0 0 0 3px rgba(45,111,191,.1)}
+.anon-result{background:#fff;border:1px solid #B8D0EE;border-radius:8px;padding:16px;margin-top:16px;min-height:100px;font-family:'DM Mono',monospace;font-size:12px;color:#1A7F5A;line-height:1.7;white-space:pre-wrap}
+.anon-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.anon-tag{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;transition:all .15s}
+.anon-tag-active{background:#EBF2FB;color:#0B2B5C;border-color:#2D6FBF}
+.anon-tag-inactive{background:#fff;color:#90A4BE;border-color:#B8D0EE}
+.anon-btn-row{display:flex;gap:10px;margin-top:14px}
+.anon-btn-blue{background:#0B2B5C;color:#fff;border:none;padding:10px 22px;border-radius:6px;font-weight:600;font-size:13px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.anon-btn-blue:hover{background:#1A4A8A}
+.anon-btn-outline{background:transparent;color:#0B2B5C;border:1px solid #B8D0EE;padding:9px 20px;border-radius:6px;font-weight:500;font-size:13px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.anon-btn-outline:hover{border-color:#2D6FBF;color:#2D6FBF}
+.anon-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.anon-stat-box{background:#fff;border:1px solid #B8D0EE;border-radius:8px;padding:14px;text-align:center}
+.anon-stat-n{font-family:'DM Mono',monospace;font-size:24px;font-weight:700;color:#0B2B5C}
+.anon-stat-l{font-size:11px;color:#90A4BE;margin-top:2px}
+
+/* ═══ APP — TERMINAL ═══ */
+#win-terminal{width:700px;height:450px;top:150px;left:200px}
+.term-shell{height:100%;background:#0a0e0a;display:flex;flex-direction:column;font-family:'Space Mono',monospace}
+.term-output{flex:1;overflow-y:auto;padding:14px;font-size:12px;line-height:1.7;color:#c9d1d9}
+.term-output::-webkit-scrollbar{width:4px}
+.term-output::-webkit-scrollbar-thumb{background:#1e2d3d}
+.term-line{margin-bottom:2px}
+.term-prompt{color:var(--accent)}
+.term-cmd{color:#fff}
+.term-out{color:var(--text2)}
+.term-err{color:var(--danger)}
+.term-ok{color:var(--accent2)}
+.term-input-row{display:flex;align-items:center;padding:0 14px 14px;gap:8px}
+.term-prompt-static{color:var(--accent);font-size:12px;white-space:nowrap}
+.term-input{flex:1;background:transparent;border:none;color:#fff;font-family:'Space Mono',monospace;font-size:12px;outline:none;caret-color:var(--accent)}
+
+/* ═══ APP — ABOUT ═══ */
+#win-about{width:440px;height:360px;top:180px;left:300px}
+.about-shell{height:100%;background:var(--bg2);padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-family:'Space Mono',monospace}
+.about-logo{font-size:48px;margin-bottom:16px}
+.about-name{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:var(--accent);margin-bottom:4px}
+.about-sub{font-size:10px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+.about-info{font-size:11px;color:var(--text2);line-height:2;margin-bottom:20px}
+.about-divider{width:60px;height:2px;background:var(--border);margin:0 auto 20px}
+.about-links{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.about-link{padding:6px 14px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.05em;cursor:pointer;border:1px solid var(--border);color:var(--text2);transition:all .2s}
+.about-link:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes winOpen{from{opacity:0;transform:scale(.94) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.win.visible{animation:winOpen .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fade{animation:fadeIn .3s ease}
+
+/* ═══ CONTEXT MENU ═══ */
+#ctx-menu{position:fixed;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px;z-index:9000;display:none;box-shadow:0 8px 32px rgba(0,0,0,.6);min-width:180px}
+.ctx-item{padding:7px 12px;font-family:'Space Mono',monospace;font-size:11px;color:var(--text2);cursor:pointer;border-radius:5px;transition:all .15s;display:flex;align-items:center;gap:8px}
+.ctx-item:hover{background:rgba(200,240,101,.08);color:var(--accent)}
+.ctx-sep{height:1px;background:var(--border);margin:4px 0}
+
+/* ═══ NOTIFICATION ═══ */
+#notif{position:fixed;top:50px;right:16px;z-index:8000;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.notif-toast{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:flex-start;gap:10px;width:280px;animation:slideNotif .3s ease;pointer-events:all;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+@keyframes slideNotif{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.notif-icon{font-size:18px;flex-shrink:0}
+.notif-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#fff;margin-bottom:2px}
+.notif-body{font-size:11px;color:var(--text2);line-height:1.4}
+.notif-close{margin-left:auto;color:var(--text3);cursor:pointer;font-size:14px;line-height:1}
+.notif-close:hover{color:var(--text)}
+</style>
+</head>
+<body>
+
+<!-- ═══ BOOT ═══ -->
+<div id="boot">
+ <div class="logo-ascii">
+██╗ ██╗██╗██████╗ ███████╗ ██████╗ ███████╗
+██║ ██║██║██╔══██╗██╔════╝██╔═══██╗██╔════╝
+██║ ██║██║██████╔╝█████╗ ██║ ██║███████╗
+╚██╗ ██╔╝██║██╔══██╗██╔══╝ ██║ ██║╚════██║
+ ╚████╔╝ ██║██████╔╝███████╗╚██████╔╝███████║
+ ╚═══╝ ╚═╝╚═════╝ ╚══════╝ ╚═════╝ ╚══════╝
+ VibeCodingChile OS v2.6.1</div>
+ <div id="boot-lines"></div>
+ <div class="progress-bar"><div class="progress-fill" id="boot-progress"></div></div>
+</div>
+
+<!-- ═══ DESKTOP ═══ -->
+<div id="desktop">
+ <div class="wallpaper"></div>
+ <div class="grid-overlay"></div>
+
+ <!-- Taskbar -->
+ <div id="taskbar">
+ <div class="taskbar-logo" onclick="toggleAbout()"> VibeOS</div>
+ <div class="taskbar-sep"></div>
+ <div class="taskbar-apps" id="taskbar-apps"></div>
+ <div class="taskbar-right">
+ <div id="status-bar">
+ <span class="status-pill pill-green">ONLINE</span>
+ <span class="status-pill pill-yellow">CL</span>
+ </div>
+ <div id="clock"></div>
+ </div>
+ </div>
+
+ <!-- Windows -->
+
+ <!-- LEGALIZES -->
+ <div class="win" id="win-legalizes" style="top:60px;left:80px;width:1060px;height:680px">
+ <div class="win-titlebar" data-win="legalizes">
+ <div class="win-controls">
+ <button class="win-ctrl wc-close" onclick="closeWin('legalizes')"></button>
+ <button class="win-ctrl wc-min" onclick="minimizeWin('legalizes')"></button>
+ <button class="win-ctrl wc-max" onclick="maximizeWin('legalizes')"></button>
+ </div>
+ <span class="win-title">Legalizes — Plataforma Legal IA</span>
+ </div>
+ <div class="win-body">
+ <div class="leg-shell">
+ <!-- Sidebar -->
+ <div class="leg-sidebar">
+ <div class="leg-logo">
+ 
+ <span class="leg-logo-text">Legalizes</span>
+ </div>
+ <div class="leg-nav">
+ <div class="leg-nav-item active" onclick="legNav('dashboard',this)">Dashboard</div>
+ <div class="leg-nav-item" onclick="legNav('chat',this)">Chat Legal</div>
+ <div class="leg-nav-item" onclick="legNav('docs',this)">Documentos</div>
+ <div class="leg-nav-item" onclick="legNav('kb',this)">Base Legal</div>
+ <div class="leg-nav-item" onclick="legNav('admin',this)">Admin</div>
+ </div>
+ <div class="leg-user">
+ <div class="leg-avatar">MR</div>
+ <div class="leg-user-info">
+ <div class="leg-user-name">Matías Rojas F.</div>
+ <div class="leg-user-role">Pro · Abogado</div>
+ </div>
+ </div>
+ </div>
+ <!-- Main -->
+ <div class="leg-main">
+ <!-- Dashboard -->
+ <div class="leg-page active" id="leg-dashboard">
+ <h2 style="font-family:'Syne',sans-serif;color:#E8E9EF;font-size:20px;font-weight:700;margin-bottom:4px">Dashboard</h2>
+ <p style="font-size:13px;color:#6B7080;margin-bottom:20px">Bienvenido, Matías. Tu actividad de hoy.</p>
+ <div class="leg-stats-grid">
+ <div class="leg-stat"><div class="leg-stat-val">1,284</div><div class="leg-stat-lbl">Usuarios activos</div></div>
+ <div class="leg-stat"><div class="leg-stat-val" style="color:#2ECC71">28.4K</div><div class="leg-stat-lbl">Consultas IA</div></div>
+ <div class="leg-stat"><div class="leg-stat-val" style="color:#3498DB">4,891</div><div class="leg-stat-lbl">Documentos</div></div>
+ <div class="leg-stat"><div class="leg-stat-val" style="color:#8B5CF6">47</div><div class="leg-stat-lbl">Activos ahora</div></div>
+ </div>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+ <div class="leg-card">
+ <div class="leg-section-title">Actividad reciente</div>
+ <div style="display:flex;flex-direction:column;gap:10px">
+ <div style="display:flex;gap:10px;align-items:flex-start">
+ <span style="font-size:16px"></span>
+ <div>
+ <p style="font-size:13px;color:#E8E9EF;font-weight:500">Contrato_Servicios_2024.pdf indexado</p>
+ <p style="font-size:11px;color:#6B7080">Hace 2 horas · 24 chunks</p>
+ </div>
+ </div>
+ <div style="display:flex;gap:10px;align-items:flex-start">
+ <span style="font-size:16px"></span>
+ <div>
+ <p style="font-size:13px;color:#E8E9EF;font-weight:500">148 consultas al asistente</p>
+ <p style="font-size:11px;color:#6B7080">Hoy · Promedio 2.3s</p>
+ </div>
+ </div>
+ <div style="display:flex;gap:10px;align-items:flex-start">
+ <span style="font-size:16px"></span>
+ <div>
+ <p style="font-size:13px;color:#E8E9EF;font-weight:500">3 nuevos usuarios registrados</p>
+ <p style="font-size:11px;color:#6B7080">Esta semana</p>
+ </div>
+ </div>
+ </div>
+ </div>
+ <div class="leg-card">
+ <div class="leg-section-title">Top consultas</div>
+ <div style="display:flex;flex-direction:column;gap:8px">
+ <div style="display:flex;justify-content:space-between;align-items:center">
+ <span style="font-size:13px;color:#9299A8">Código del Trabajo</span>
+ <span style="font-family:'DM Mono',monospace;font-size:12px;color:#C9A84C">38%</span>
+ </div>
+ <div style="display:flex;justify-content:space-between;align-items:center">
+ <span style="font-size:13px;color:#9299A8">Derecho Civil</span>
+ <span style="font-family:'DM Mono',monospace;font-size:12px;color:#3498DB">27%</span>
+ </div>
+ <div style="display:flex;justify-content:space-between;align-items:center">
+ <span style="font-size:13px;color:#9299A8">Penal</span>
+ <span style="font-family:'DM Mono',monospace;font-size:12px;color:#8B5CF6">18%</span>
+ </div>
+ <div style="display:flex;justify-content:space-between;align-items:center">
+ <span style="font-size:13px;color:#9299A8">Datos Personales</span>
+ <span style="font-family:'DM Mono',monospace;font-size:12px;color:#2ECC71">11%</span>
+ </div>
+ <div style="display:flex;justify-content:space-between;align-items:center">
+ <span style="font-size:13px;color:#9299A8">Procesal</span>
+ <span style="font-family:'DM Mono',monospace;font-size:12px;color:#E74C3C">6%</span>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ <!-- Chat -->
+ <div class="leg-page" id="leg-chat" style="padding:0;height:100%;display:none;flex-direction:column">
+ <div class="leg-chat-layout">
+ <div class="leg-suggestions" id="leg-sug-area">
+ <div class="leg-sug" onclick="legSuggest(this)">¿Qué dice el Art. 159 Código del Trabajo?</div>
+ <div class="leg-sug" onclick="legSuggest(this)">Explícame la Ley 19.628</div>
+ <div class="leg-sug" onclick="legSuggest(this)">¿Qué es la Ley 21.719?</div>
+ <div class="leg-sug" onclick="legSuggest(this)">Causales de nulidad contractual</div>
+ <div class="leg-sug" onclick="legSuggest(this)">Procedimiento monitorio laboral</div>
+ </div>
+ <div class="leg-chat-msgs" id="leg-msgs">
+ <div class="leg-msg-ai fade"><strong>Lex</strong> — Asistente Legal IA<br><br>Hola, soy <strong>Lex</strong>, tu asistente legal IA para Chile. Puedo ayudarte con consultas sobre el ordenamiento jurídico chileno, análisis de documentos y redacción legal.<br><br>¿En qué puedo ayudarte hoy?</div>
+ </div>
+ <div class="leg-chat-input-area">
+ <input class="leg-input" id="leg-chat-input" placeholder="Consulta sobre normativa chilena..." onkeydown="if(event.key==='Enter')legSend()">
+ <button class="leg-send" onclick="legSend()">Enviar ↗</button>
+ </div>
+ </div>
+ </div>
+ <!-- Docs -->
+ <div class="leg-page" id="leg-docs">
+ <h2 style="font-family:'Syne',sans-serif;color:#E8E9EF;font-size:20px;font-weight:700;margin-bottom:16px"> Documentos</h2>
+ <div class="leg-card" style="padding:0;overflow:hidden">
+ <table style="width:100%;border-collapse:collapse">
+ <thead><tr style="background:#0E0F14">
+ <th style="padding:10px 14px;font-size:10px;color:#6B7080;font-weight:600;text-align:left;border-bottom:1px solid #1E2028">Nombre</th>
+ <th style="padding:10px 14px;font-size:10px;color:#6B7080;font-weight:600;text-align:left;border-bottom:1px solid #1E2028">Estado</th>
+ <th style="padding:10px 14px;font-size:10px;color:#6B7080;font-weight:600;text-align:left;border-bottom:1px solid #1E2028">Tamaño</th>
+ <th style="padding:10px 14px;font-size:10px;color:#6B7080;font-weight:600;text-align:left;border-bottom:1px solid #1E2028">Fecha</th>
+ </tr></thead>
+ <tbody id="leg-docs-tbody">
+ <tr><td style="padding:12px 14px;font-size:13px;color:#E8E9EF;border-bottom:1px solid #1E202810">Contrato_Servicios_2024.pdf</td><td><span style="padding:2px 8px;border-radius:4px;font-size:11px;background:rgba(46,204,113,0.12);color:#2ECC71;border:1px solid rgba(46,204,113,0.25)">Indexado</span></td><td style="padding:12px 14px;font-size:13px;color:#9299A8;border-bottom:1px solid #1E202810">1.2 MB</td><td style="padding:12px 14px;font-size:13px;color:#9299A8;border-bottom:1px solid #1E202810">Hace 2h</td></tr>
+ <tr><td style="padding:12px 14px;font-size:13px;color:#E8E9EF;border-bottom:1px solid #1E202810">Poder_Notarial_Torres.docx</td><td><span style="padding:2px 8px;border-radius:4px;font-size:11px;background:rgba(46,204,113,0.12);color:#2ECC71;border:1px solid rgba(46,204,113,0.25)">Indexado</span></td><td style="padding:12px 14px;font-size:13px;color:#9299A8;border-bottom:1px solid #1E202810">340 KB</td><td style="padding:12px 14px;font-size:13px;color:#9299A8;border-bottom:1px solid #1E202810">Ayer</td></tr>
+ <tr><td style="padding:12px 14px;font-size:13px;color:#E8E9EF;border-bottom:1px solid #1E202810">Demanda_Laboral_Caso15.pdf</td><td><span style="padding:2px 8px;border-radius:4px;font-size:11px;background:rgba(255,160,0,0.12);color:#ffa502;border:1px solid rgba(255,160,0,0.25)">Procesando</span></td><td style="padding:12px 14px;font-size:13px;color:#9299A8;border-bottom:1px solid #1E202810">2.8 MB</td><td style="padding:12px 14px;font-size:13px;color:#9299A8;border-bottom:1px solid #1E202810">2 días</td></tr>
+ <tr><td style="padding:12px 14px;font-size:13px;color:#E8E9EF">Estatutos_Empresa.txt</td><td><span style="padding:2px 8px;border-radius:4px;font-size:11px;background:rgba(46,204,113,0.12);color:#2ECC71;border:1px solid rgba(46,204,113,0.25)">Indexado</span></td><td style="padding:12px 14px;font-size:13px;color:#9299A8">56 KB</td><td style="padding:12px 14px;font-size:13px;color:#9299A8">1 semana</td></tr>
+ </tbody>
+ </table>
+ </div>
+ </div>
+ <!-- KB -->
+ <div class="leg-page" id="leg-kb">
+ <h2 style="font-family:'Syne',sans-serif;color:#E8E9EF;font-size:20px;font-weight:700;margin-bottom:16px"> Base de Conocimiento</h2>
+ <div style="display:flex;flex-direction:column;gap:10px">
+ <div class="leg-card" style="cursor:pointer" onmouseenter="this.style.borderColor='rgba(201,168,76,0.3)'" onmouseleave="this.style.borderColor='#1E2028'">
+ <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><span style="font-size:12px;color:#C9A84C;font-weight:600">DERECHO LABORAL</span><span style="font-family:'DM Mono',monospace;font-size:11px;color:#2ECC71">97%</span></div>
+ <p style="font-size:14px;font-weight:600;color:#E8E9EF;margin-bottom:6px">Terminación de Contrato de Trabajo en Chile</p>
+ <p style="font-size:12px;color:#6B7080;line-height:1.6">El Art. 159 del Código del Trabajo establece las causales de término: mutuo acuerdo, renuncia, muerte del trabajador y vencimiento del plazo.</p>
+ </div>
+ <div class="leg-card" style="cursor:pointer" onmouseenter="this.style.borderColor='rgba(201,168,76,0.3)'" onmouseleave="this.style.borderColor='#1E2028'">
+ <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><span style="font-size:12px;color:#3498DB;font-weight:600">DATOS PERSONALES</span><span style="font-family:'DM Mono',monospace;font-size:11px;color:#2ECC71">94%</span></div>
+ <p style="font-size:14px;font-weight:600;color:#E8E9EF;margin-bottom:6px">Ley 19.628 y nueva Ley 21.719 de Datos</p>
+ <p style="font-size:12px;color:#6B7080;line-height:1.6">La ley 19.628 regula el tratamiento de datos personales. La Ley 21.719 moderniza el marco con plena vigencia en diciembre 2026.</p>
+ </div>
+ <div class="leg-card" style="cursor:pointer" onmouseenter="this.style.borderColor='rgba(201,168,76,0.3)'" onmouseleave="this.style.borderColor='#1E2028'">
+ <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><span style="font-size:12px;color:#8B5CF6;font-weight:600">DERECHO CIVIL</span><span style="font-family:'DM Mono',monospace;font-size:11px;color:#2ECC71">91%</span></div>
+ <p style="font-size:14px;font-weight:600;color:#E8E9EF;margin-bottom:6px">Responsabilidad Civil Extracontractual</p>
+ <p style="font-size:12px;color:#6B7080;line-height:1.6">El Art. 2314 del Código Civil establece la obligación de indemnización por daño causado, principio neminem laedere.</p>
+ </div>
+ </div>
+ </div>
+ <!-- Admin -->
+ <div class="leg-page" id="leg-admin">
+ <h2 style="font-family:'Syne',sans-serif;color:#E8E9EF;font-size:20px;font-weight:700;margin-bottom:16px"> Administración</h2>
+ <div class="leg-card" style="padding:0;overflow:hidden">
+ <table style="width:100%;border-collapse:collapse">
+ <thead><tr style="background:#0E0F14">
+ <th style="padding:10px 14px;font-size:10px;color:#6B7080;font-weight:600;text-align:left;border-bottom:1px solid #1E2028">Usuario</th>
+ <th style="padding:10px 14px;font-size:10px;color:#6B7080;font-weight:600;text-align:left;border-bottom:1px solid #1E2028">Rol</th>
+ <th style="padding:10px 14px;font-size:10px;color:#6B7080;font-weight:600;text-align:left;border-bottom:1px solid #1E2028">Plan</th>
+ <th style="padding:10px 14px;font-size:10px;color:#6B7080;font-weight:600;text-align:left;border-bottom:1px solid #1E2028">Consultas</th>
+ </tr></thead>
+ <tbody>
+ <tr><td style="padding:12px 14px;font-size:13px;color:#E8E9EF;border-bottom:1px solid #1E202810">Matías Rojas F.</td><td style="padding:12px 14px;border-bottom:1px solid #1E202810"><span style="color:#C9A84C;font-size:11px;font-weight:600">Abogado</span></td><td style="padding:12px 14px;border-bottom:1px solid #1E202810"><span style="padding:2px 8px;border-radius:4px;font-size:11px;background:rgba(201,168,76,0.12);color:#C9A84C;border:1px solid rgba(201,168,76,0.2)">Pro</span></td><td style="padding:12px 14px;font-family:'DM Mono',monospace;font-size:12px;color:#9299A8;border-bottom:1px solid #1E202810">148</td></tr>
+ <tr><td style="padding:12px 14px;font-size:13px;color:#E8E9EF;border-bottom:1px solid #1E202810">Camila Reyes</td><td style="padding:12px 14px;border-bottom:1px solid #1E202810"><span style="color:#9299A8;font-size:11px;font-weight:600">Cliente</span></td><td style="padding:12px 14px;border-bottom:1px solid #1E202810"><span style="padding:2px 8px;border-radius:4px;font-size:11px;background:#1E2028;color:#6B7080;border:1px solid #1E2028">Free</span></td><td style="padding:12px 14px;font-family:'DM Mono',monospace;font-size:12px;color:#9299A8;border-bottom:1px solid #1E202810">22</td></tr>
+ <tr><td style="padding:12px 14px;font-size:13px;color:#E8E9EF;border-bottom:1px solid #1E202810">Rodrigo Muñoz</td><td style="padding:12px 14px;border-bottom:1px solid #1E202810"><span style="color:#C9A84C;font-size:11px;font-weight:600">Abogado</span></td><td style="padding:12px 14px;border-bottom:1px solid #1E202810"><span style="padding:2px 8px;border-radius:4px;font-size:11px;background:rgba(201,168,76,0.12);color:#C9A84C;border:1px solid rgba(201,168,76,0.2)">Pro</span></td><td style="padding:12px 14px;font-family:'DM Mono',monospace;font-size:12px;color:#9299A8;border-bottom:1px solid #1E202810">391</td></tr>
+ <tr><td style="padding:12px 14px;font-size:13px;color:#E8E9EF">Felipe Contreras</td><td style="padding:12px 14px"><span style="color:#E74C3C;font-size:11px;font-weight:600">Admin</span></td><td style="padding:12px 14px"><span style="padding:2px 8px;border-radius:4px;font-size:11px;background:rgba(201,168,76,0.12);color:#C9A84C;border:1px solid rgba(201,168,76,0.2)">Pro</span></td><td style="padding:12px 14px;font-family:'DM Mono',monospace;font-size:12px;color:#9299A8">0</td></tr>
+ </tbody>
+ </table>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- AGENT OS -->
+ <div class="win" id="win-agentOS" style="top:70px;left:100px;width:1050px;height:680px">
+ <div class="win-titlebar" data-win="agentOS">
+ <div class="win-controls">
+ <button class="win-ctrl wc-close" onclick="closeWin('agentOS')"></button>
+ <button class="win-ctrl wc-min" onclick="minimizeWin('agentOS')"></button>
+ <button class="win-ctrl wc-max" onclick="maximizeWin('agentOS')"></button>
+ </div>
+ <span class="win-title">VibeCodingChile OS — Sistema de Agentes IA</span>
+ </div>
+ <div class="win-body">
+ <div class="os-shell">
+ <div class="os-sidebar">
+ <div class="os-logo-area">
+ 
+ <div class="os-logo-txt">VibeCoding<br>Chile OS</div>
+ </div>
+ <div class="os-nav">
+ <div class="os-nav-sec">Principal</div>
+ <div class="os-nav-item active" onclick="osNav('dashboard',this)">Dashboard <span class="os-nav-badge g">●</span></div>
+ <div class="os-nav-item" onclick="osNav('agents',this)">Agentes IA <span class="os-nav-badge">6</span></div>
+ <div class="os-nav-item" onclick="osNav('pipelines',this)">Pipelines</div>
+ <div class="os-nav-sec">Integraciones</div>
+ <div class="os-nav-item" onclick="osNav('whatsapp',this)">WhatsApp API</div>
+ <div class="os-nav-item" onclick="osNav('claude',this)">Claude API</div>
+ <div class="os-nav-sec">Sistema</div>
+ <div class="os-nav-item" onclick="osNav('logs',this)">Logs</div>
+ <div class="os-nav-item" onclick="osNav('settings',this)">Config</div>
+ </div>
+ <div style="padding:10px 14px;border-top:1px solid var(--border);font-size:9px;color:var(--text3);font-family:'Space Mono',monospace">
+ <span class="pulse-dot"></span> Sistema operativo · v2.6.1
+ </div>
+ </div>
+ <div class="os-main">
+ <div class="os-topbar">
+ <div>
+ <div class="os-page-title" id="os-page-title">Dashboard</div>
+ <div class="os-page-sub" id="os-page-sub">Visión general del sistema de agentes</div>
+ </div>
+ <div style="margin-left:auto;display:flex;gap:8px">
+ <button class="os-btn os-btn-ghost" onclick="showNotif('','Sistema','Todos los agentes respondiendo normalmente')">↻ Refresh</button>
+ <button class="os-btn os-btn-primary">+ Nuevo Agente</button>
+ </div>
+ </div>
+ <div class="os-content">
+ <!-- Dashboard page -->
+ <div class="os-page active" id="os-dashboard">
+ <div class="os-stats-grid">
+ <div class="os-stat lime"><div class="os-stat-lbl">Agentes Activos</div><div class="os-stat-val lime">6/6</div><div class="os-stat-sub">100% uptime</div></div>
+ <div class="os-stat green"><div class="os-stat-lbl">Req. Procesadas</div><div class="os-stat-val green">14.2K</div><div class="os-stat-sub">+18% esta semana</div></div>
+ <div class="os-stat orange"><div class="os-stat-lbl">Latencia P95</div><div class="os-stat-val orange">1.8s</div><div class="os-stat-sub">Claude Sonnet 4</div></div>
+ <div class="os-stat purple"><div class="os-stat-lbl">WhatsApp Msgs</div><div class="os-stat-val purple">3.4K</div><div class="os-stat-sub">Hoy</div></div>
+ </div>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+ <div class="os-card">
+ <div class="os-card-hdr"><span class="os-card-ttl">Agentes Activos</span><span class="os-nav-badge g">LIVE</span></div>
+ <div class="os-card-body">
+ <div class="os-agent-row">
+ <div class="os-agent-icon" style="background:rgba(201,168,76,0.15);font-family:'Space Mono',monospace;font-size:10px;font-weight:700">LX</div>
+ <div style="flex:1">
+ <div class="os-agent-name">Lex — Asistente Legal</div>
+ <div class="os-agent-desc">Legalizes · Ley 21.719 · Código del Trabajo</div>
+ </div>
+ <span class="os-badge os-badge-green">ACTIVO</span>
+ </div>
+ <div class="os-agent-row">
+ <div class="os-agent-icon" style="background:rgba(0,229,160,0.12);font-family:'Space Mono',monospace;font-size:10px;font-weight:700">CW</div>
+ <div style="flex:1">
+ <div class="os-agent-name">Compliance Wizard</div>
+ <div class="os-agent-desc">Ley 21.719 · ARCOP · WhatsApp checks</div>
+ </div>
+ <span class="os-badge os-badge-green">ACTIVO</span>
+ </div>
+ <div class="os-agent-row">
+ <div class="os-agent-icon" style="background:rgba(37,211,102,0.12);font-family:'Space Mono',monospace;font-size:10px;font-weight:700">WA</div>
+ <div style="flex:1">
+ <div class="os-agent-name">WhatsApp Bot</div>
+ <div class="os-agent-desc">Twilio · Business API · Opt-in flow</div>
+ </div>
+ <span class="os-badge os-badge-green">ACTIVO</span>
+ </div>
+ <div class="os-agent-row">
+ <div class="os-agent-icon" style="background:rgba(77,159,255,0.12);font-family:'Space Mono',monospace;font-size:10px;font-weight:700">PII</div>
+ <div style="flex:1">
+ <div class="os-agent-name">Anonimizador PII</div>
+ <div class="os-agent-desc">RUT · Email · Teléfono · Dirección CL</div>
+ </div>
+ <span class="os-badge os-badge-green">ACTIVO</span>
+ </div>
+ <div class="os-agent-row">
+ <div class="os-agent-icon" style="background:rgba(168,85,247,0.12);font-family:'Space Mono',monospace;font-size:10px;font-weight:700">AN</div>
+ <div style="flex:1">
+ <div class="os-agent-name">Analytics Agent</div>
+ <div class="os-agent-desc">RAG metrics · Usage reports</div>
+ </div>
+ <span class="os-badge os-badge-yellow">STANDBY</span>
+ </div>
+ </div>
+ </div>
+ <div>
+ <div class="os-card" style="margin-bottom:14px">
+ <div class="os-card-hdr"><span class="os-card-ttl">Actividad del Sistema</span></div>
+ <div class="os-card-body" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text2);display:flex;flex-direction:column;gap:6px">
+ <div><span style="color:var(--accent2)">✓</span> [08:14] Lex procesó 12 consultas laborales</div>
+ <div><span style="color:var(--accent2)">✓</span> [08:22] WhatsApp Bot: 43 msgs recibidos</div>
+ <div><span style="color:var(--accent)">→</span> [08:31] Compliance Wizard: 2 auditorías</div>
+ <div><span style="color:var(--accent2)">✓</span> [08:45] Anonimizador: 156 RUTs procesados</div>
+ <div><span style="color:var(--warn)">⚠</span> [08:52] Rate limit Claude API: 80%</div>
+ <div><span style="color:var(--accent2)">✓</span> [09:14] Deploy exitoso v2.6.1</div>
+ </div>
+ </div>
+ <div class="os-card">
+ <div class="os-card-hdr"><span class="os-card-ttl">Claude API</span><span class="os-badge os-badge-green">claude-sonnet-4</span></div>
+ <div class="os-card-body">
+ <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:6px"><span>Tokens usados hoy</span><span style="color:var(--accent);font-family:'Space Mono',monospace">1.2M / 5M</span></div>
+ <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:12px"><div style="width:24%;height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px"></div></div>
+ <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:6px"><span>WhatsApp msgs</span><span style="color:var(--accent2);font-family:'Space Mono',monospace">3,421 / 10K</span></div>
+ <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:34%;height:100%;background:var(--accent2);border-radius:3px"></div></div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ <!-- Agents page -->
+ <div class="os-page" id="os-agents">
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+ <div class="os-card" style="cursor:pointer" onclick="openWin('legalizes')">
+ <div class="os-card-hdr"><div style="display:flex;align-items:center;gap:8px"><span class="os-card-ttl">Legalizes — Chat Legal IA</span></div><span class="os-badge os-badge-green">ACTIVO</span></div>
+ <div class="os-card-body"><p style="font-size:11px;color:var(--text2);line-height:1.6">Asistente legal para el derecho chileno con RAG sobre normativa vigente. Integra Código del Trabajo, Civil, Penal y Ley 21.719.</p><div style="margin-top:10px;display:flex;gap:6px"><span class="os-badge os-badge-yellow">Claude API</span><span class="os-badge os-badge-green">RAG</span></div></div>
+ </div>
+ <div class="os-card" style="cursor:pointer" onclick="openWin('wizard')">
+ <div class="os-card-hdr"><div style="display:flex;align-items:center;gap:8px"><span class="os-card-ttl">Compliance Wizard 21.719</span></div><span class="os-badge os-badge-green">ACTIVO</span></div>
+ <div class="os-card-body"><p style="font-size:11px;color:var(--text2);line-height:1.6">Diagnóstico interactivo de cumplimiento con la Ley 21.719 de protección de datos. Incluye chequeo WhatsApp Business API.</p><div style="margin-top:10px;display:flex;gap:6px"><span class="os-badge os-badge-yellow">Ley 21.719</span><span style="padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;background:rgba(37,211,102,0.12);color:#25D366;border:1px solid rgba(37,211,102,0.2)">WhatsApp</span></div></div>
+ </div>
+ <div class="os-card" style="cursor:pointer" onclick="openWin('agente')">
+ <div class="os-card-hdr"><div style="display:flex;align-items:center;gap:8px"><span class="os-card-ttl">Agente Jurídico Chile</span></div><span class="os-badge os-badge-green">ACTIVO</span></div>
+ <div class="os-card-body"><p style="font-size:11px;color:var(--text2);line-height:1.6">Agente offline con base de conocimiento completa de la Ley 21.719, normativa tributaria, laboral y civil chilena.</p><div style="margin-top:10px;display:flex;gap:6px"><span class="os-badge os-badge-yellow">Offline KB</span><span class="os-badge os-badge-green">Multi-ley</span></div></div>
+ </div>
+ <div class="os-card" style="cursor:pointer" onclick="openWin('anon')">
+ <div class="os-card-hdr"><div style="display:flex;align-items:center;gap:8px"><span class="os-card-ttl">Anonimizador PII Chile</span></div><span class="os-badge os-badge-green">ACTIVO</span></div>
+ <div class="os-card-body"><p style="font-size:11px;color:var(--text2);line-height:1.6">Detección y anonimización de datos personales chilenos: RUT, teléfono, dirección, patente, email. Cumple Ley 21.719.</p><div style="margin-top:10px;display:flex;gap:6px"><span class="os-badge os-badge-yellow">PII</span><span class="os-badge os-badge-green">CL-Específico</span></div></div>
+ </div>
+ </div>
+ </div>
+ <!-- Pipelines -->
+ <div class="os-page" id="os-pipelines">
+ <div class="os-card">
+ <div class="os-card-hdr"><span class="os-card-ttl">Pipelines Activos</span><button class="os-btn os-btn-primary">+ Pipeline</button></div>
+ <div class="os-card-body" style="font-family:'Space Mono',monospace;font-size:11px;display:flex;flex-direction:column;gap:12px">
+ <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:6px;border:1px solid var(--border)"><span style="color:var(--accent2)">▶</span><span style="flex:1;color:var(--text)">WhatsApp → Lex → Response → WhatsApp</span><span class="os-badge os-badge-green">LIVE</span></div>
+ <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:6px;border:1px solid var(--border)"><span style="color:var(--accent)">▶</span><span style="flex:1;color:var(--text)">Upload PDF → OCR → Chunk → Index → RAG</span><span class="os-badge os-badge-green">LIVE</span></div>
+ <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:6px;border:1px solid var(--border)"><span style="color:var(--accent4)">▶</span><span style="flex:1;color:var(--text)">Text Input → PII Scan → Anonymize → Return</span><span class="os-badge os-badge-green">LIVE</span></div>
+ <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:6px;border:1px solid var(--border)"><span style="color:var(--accent3)">▶</span><span style="flex:1;color:var(--text)">Compliance Form → Score → Report → Email</span><span class="os-badge os-badge-yellow">STANDBY</span></div>
+ </div>
+ </div>
+ </div>
+ <!-- WhatsApp -->
+ <div class="os-page" id="os-whatsapp">
+ <div class="os-stats-grid">
+ <div class="os-stat green"><div class="os-stat-lbl">Msgs Hoy</div><div class="os-stat-val green">3,421</div></div>
+ <div class="os-stat lime"><div class="os-stat-lbl">Tasa Entrega</div><div class="os-stat-val lime">99.2%</div></div>
+ <div class="os-stat orange"><div class="os-stat-lbl">Opt-ins</div><div class="os-stat-val orange">847</div></div>
+ <div class="os-stat purple"><div class="os-stat-lbl">Opt-outs</div><div class="os-stat-val purple">12</div></div>
+ </div>
+ <div class="os-card">
+ <div class="os-card-hdr"><span class="os-card-ttl">Configuración Twilio WhatsApp</span><span class="os-badge os-badge-green">CONECTADO</span></div>
+ <div class="os-card-body" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text2);display:flex;flex-direction:column;gap:8px">
+ <div style="display:flex;gap:12px"><span style="color:var(--text3);min-width:120px">Número</span><span style="color:var(--accent)">+56 9 XXXX XXXX</span></div>
+ <div style="display:flex;gap:12px"><span style="color:var(--text3);min-width:120px">Business ID</span><span style="color:var(--text)">waba_XXXXXXXXXX</span></div>
+ <div style="display:flex;gap:12px"><span style="color:var(--text3);min-width:120px">Templates</span><span style="color:var(--accent2)">4 aprobados</span></div>
+ <div style="display:flex;gap:12px"><span style="color:var(--text3);min-width:120px">Webhook</span><span style="color:var(--accent2)">✓ Activo</span></div>
+ </div>
+ </div>
+ </div>
+ <!-- Claude API -->
+ <div class="os-page" id="os-claude">
+ <div class="os-card">
+ <div class="os-card-hdr"><span class="os-card-ttl">Claude API — Anthropic</span><span class="os-badge os-badge-green">claude-sonnet-4-20250514</span></div>
+ <div class="os-card-body" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text2);display:flex;flex-direction:column;gap:8px">
+ <div style="display:flex;gap:12px"><span style="color:var(--text3);min-width:160px">Modelo activo</span><span style="color:var(--accent)">claude-sonnet-4-20250514</span></div>
+ <div style="display:flex;gap:12px"><span style="color:var(--text3);min-width:160px">Max tokens</span><span style="color:var(--text)">8,192</span></div>
+ <div style="display:flex;gap:12px"><span style="color:var(--text3);min-width:160px">Temperature</span><span style="color:var(--text)">0.3 (legal)</span></div>
+ <div style="display:flex;gap:12px"><span style="color:var(--text3);min-width:160px">System prompt</span><span style="color:var(--accent2)">✓ Legal CL v3</span></div>
+ <div style="display:flex;gap:12px"><span style="color:var(--text3);min-width:160px">Tokens hoy</span><span style="color:var(--accent)">1.2M / 5M</span></div>
+ </div>
+ </div>
+ </div>
+ <!-- Logs -->
+ <div class="os-page" id="os-logs">
+ <div class="os-card">
+ <div class="os-card-hdr"><span class="os-card-ttl">System Logs</span><button class="os-btn os-btn-ghost" onclick="clearLogs()">Limpiar</button></div>
+ <div class="os-card-body" id="os-logs-body" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text2);max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:4px">
+ <div><span style="color:var(--accent2)">[INFO]</span> Sistema iniciado correctamente · v2.6.1</div>
+ <div><span style="color:var(--accent2)">[INFO]</span> Lex Legal Agent: READY</div>
+ <div><span style="color:var(--accent2)">[INFO]</span> Compliance Wizard: READY</div>
+ <div><span style="color:var(--accent2)">[INFO]</span> WhatsApp Bot: CONNECTED</div>
+ <div><span style="color:var(--accent2)">[INFO]</span> Anonimizador: READY</div>
+ <div><span style="color:var(--accent)">[WARN]</span> API Rate: 80% threshold approaching</div>
+ <div><span style="color:var(--accent2)">[INFO]</span> 14,231 requests procesadas hoy</div>
+ </div>
+ </div>
+ </div>
+ <!-- Settings -->
+ <div class="os-page" id="os-settings">
+ <div class="os-card">
+ <div class="os-card-hdr"><span class="os-card-ttl">Configuración del Sistema</span></div>
+ <div class="os-card-body" style="display:flex;flex-direction:column;gap:14px">
+ <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:12px;color:var(--text);font-weight:600">Modo Debug</div><div style="font-size:10px;color:var(--text3)">Logging verboso de todas las peticiones</div></div><div style="width:36px;height:20px;background:var(--border);border-radius:10px;cursor:pointer;position:relative" onclick="this.style.background=this.style.background===''||this.style.background===''?'var(--accent2)':'var(--border)'"></div></div>
+ <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:12px;color:var(--text);font-weight:600">Auto-backup</div><div style="font-size:10px;color:var(--text3)">Backup automático cada 24h a S3</div></div><div style="width:36px;height:20px;background:var(--accent2);border-radius:10px;cursor:pointer"></div></div>
+ <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0"><div><div style="font-size:12px;color:var(--text);font-weight:600">Alertas por email</div><div style="font-size:10px;color:var(--text3)">Notificaciones críticas del sistema</div></div><div style="width:36px;height:20px;background:var(--accent2);border-radius:10px;cursor:pointer"></div></div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- COMPLIANCE WIZARD -->
+ <div class="win" id="win-wizard" style="top:80px;left:150px;width:820px;height:680px">
+ <div class="win-titlebar" data-win="wizard">
+ <div class="win-controls">
+ <button class="win-ctrl wc-close" onclick="closeWin('wizard')"></button>
+ <button class="win-ctrl wc-min" onclick="minimizeWin('wizard')"></button>
+ <button class="win-ctrl wc-max" onclick="maximizeWin('wizard')"></button>
+ </div>
+ <span class="win-title">Compliance Wizard — Ley 21.719</span>
+ </div>
+ <div class="win-body" style="overflow:hidden">
+ <div class="wiz-shell" id="wiz-shell">
+ <div style="text-align:center;margin-bottom:28px">
+ <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);border-radius:20px;padding:6px 16px;margin-bottom:16px">
+ <span style="font-size:12px;font-weight:700;color:#00E5A0;letter-spacing:.06em">LEY 21.719 · CHILE · 2026</span>
+ </div>
+ <h1 style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#E8EAF2;margin-bottom:8px">Diagnóstico de Cumplimiento</h1>
+ <p style="font-size:13px;color:#8890AA">Evalúa tu organización en 5 pasos · incluye WhatsApp Business API</p>
+ </div>
+ <!-- Step indicator -->
+ <div class="wiz-step-bar" id="wiz-step-bar">
+ <div class="wiz-step"><div class="wiz-step-circle current" id="wsc-0">1</div><div class="wiz-step-line" id="wsl-0"></div></div>
+ <div class="wiz-step"><div class="wiz-step-circle" id="wsc-1">2</div><div class="wiz-step-line" id="wsl-1"></div></div>
+ <div class="wiz-step"><div class="wiz-step-circle" id="wsc-2">3</div><div class="wiz-step-line" id="wsl-2"></div></div>
+ <div class="wiz-step"><div class="wiz-step-circle" id="wsc-3">4</div><div class="wiz-step-line" id="wsl-3"></div></div>
+ <div class="wiz-step" style="flex:0"><div class="wiz-step-circle" id="wsc-4">5</div></div>
+ </div>
+ <!-- Steps -->
+ <div id="wiz-step-content"></div>
+ <div class="wiz-btn-row">
+ <button class="wiz-btn-ghost" id="wiz-back" onclick="wizBack()" style="display:none">← Atrás</button>
+ <button class="wiz-btn-green" id="wiz-next" onclick="wizNext()">Continuar →</button>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- AGENTE JURIDICO -->
+ <div class="win" id="win-agente" style="top:80px;left:100px;width:940px;height:660px">
+ <div class="win-titlebar" data-win="agente">
+ <div class="win-controls">
+ <button class="win-ctrl wc-close" onclick="closeWin('agente')"></button>
+ <button class="win-ctrl wc-min" onclick="minimizeWin('agente')"></button>
+ <button class="win-ctrl wc-max" onclick="maximizeWin('agente')"></button>
+ </div>
+ <span class="win-title">Agente Jurídico Chile — Ley 21.719 & Normativa General</span>
+ </div>
+ <div class="win-body">
+ <div class="al-shell">
+ <div class="al-nav">
+ <span class="al-brand"> Agente Jurídico</span>
+ <button class="al-tab active" onclick="alPanel('chat',this)">Asistente IA</button>
+ <button class="al-tab" onclick="alPanel('ley',this)">Ley 21.719</button>
+ <button class="al-tab" onclick="alPanel('norm',this)">Normativa</button>
+ </div>
+ <!-- Chat panel -->
+ <div class="al-panel active" id="al-chat">
+ <div class="al-layout">
+ <div class="al-sidebar">
+ <div class="al-sb-sec">
+ <div class="al-sb-ttl">Normativa disponible</div>
+ <div class="al-norm-item"><div class="al-norm-dot" style="background:#C9A84C"></div><div class="al-norm-lbl">Ley 21.719 — Datos Personales</div></div>
+ <div class="al-norm-item"><div class="al-norm-dot"></div><div class="al-norm-lbl">Código del Trabajo (DFL N°1)</div></div>
+ <div class="al-norm-item"><div class="al-norm-dot"></div><div class="al-norm-lbl">Código Civil Chileno</div></div>
+ <div class="al-norm-item"><div class="al-norm-dot"></div><div class="al-norm-lbl">Ley 21.459 — Delitos Informáticos</div></div>
+ <div class="al-norm-item"><div class="al-norm-dot"></div><div class="al-norm-lbl">Ley 19.628 — Protección Datos</div></div>
+ </div>
+ <div style="padding:.8rem">
+ <div class="al-sb-ttl">Consultas rápidas</div>
+ <button class="al-qbtn" onclick="alSuggest(this)">¿Cuándo entra en vigor la Ley 21.719?</button>
+ <button class="al-qbtn" onclick="alSuggest(this)">¿Qué datos son sensibles?</button>
+ <button class="al-qbtn" onclick="alSuggest(this)">Derechos ARCOP del titular</button>
+ <button class="al-qbtn" onclick="alSuggest(this)">Multas y sanciones</button>
+ <button class="al-qbtn" onclick="alSuggest(this)">¿Qué es el Responsable del Tratamiento?</button>
+ </div>
+ </div>
+ <div class="al-chat-main">
+ <div class="al-msgs" id="al-msgs">
+ <div class="al-msg-row">
+ <div class="al-avatar al-av-bot"></div>
+ <div class="al-bubble al-bubble-bot">Hola, soy el <strong>Agente Jurídico Chile</strong>. Tengo acceso a la base de conocimiento completa de la <strong>Ley 21.719</strong> de protección de datos personales y normativa chilena vigente.<br><br>Puedo responder consultas sobre: vigencia, sanciones, derechos ARCOP, datos sensibles, principios del tratamiento y más.<br><br><em>Nota: Este agente funciona offline — respuestas basadas en KB local.</em></div>
+ </div>
+ </div>
+ <div class="al-input-area">
+ <input class="al-input" id="al-input" placeholder="Consulta sobre normativa chilena..." onkeydown="if(event.key==='Enter')alSend()">
+ <button class="al-send" onclick="alSend()">Enviar</button>
+ </div>
+ </div>
+ </div>
+ </div>
+ <!-- Ley panel -->
+ <div class="al-panel" id="al-ley" style="overflow-y:auto;padding:20px;background:#F4F7FB">
+ <h3 style="color:#0B2B5C;font-family:'Syne',sans-serif;font-size:18px;margin-bottom:16px">Ley 21.719 — Resumen Ejecutivo</h3>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+ <div style="background:#fff;border:1px solid #B8D0EE;border-left:4px solid #C9A84C;padding:14px;border-radius:4px"><strong style="color:#0B2B5C;font-size:13px"> Vigencia plena</strong><p style="font-size:12px;color:#4A5568;margin-top:4px">1 de diciembre de 2026 · Art. 1° Transitorio</p></div>
+ <div style="background:#fff;border:1px solid #B8D0EE;border-left:4px solid #E74C3C;padding:14px;border-radius:4px"><strong style="color:#0B2B5C;font-size:13px"> Multas máximas</strong><p style="font-size:12px;color:#4A5568;margin-top:4px">Hasta 10.000 UTM por infracción grave (~$6.8M USD)</p></div>
+ <div style="background:#fff;border:1px solid #B8D0EE;border-left:4px solid #2D6FBF;padding:14px;border-radius:4px"><strong style="color:#0B2B5C;font-size:13px"> Agencia nueva</strong><p style="font-size:12px;color:#4A5568;margin-top:4px">Agencia de Protección de Datos Personales (APDP)</p></div>
+ <div style="background:#fff;border:1px solid #B8D0EE;border-left:4px solid #1A7F5A;padding:14px;border-radius:4px"><strong style="color:#0B2B5C;font-size:13px"> Derechos ARCOP</strong><p style="font-size:12px;color:#4A5568;margin-top:4px">Acceso, Rectificación, Cancelación, Oposición, Portabilidad</p></div>
+ </div>
+ <div style="background:#fff;border:1px solid #B8D0EE;padding:16px;border-radius:4px;margin-top:12px">
+ <strong style="color:#0B2B5C;font-size:14px">8 Principios del Tratamiento (Art. 3°)</strong>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;font-size:12px;color:#4A5568">
+ <div>a) Licitud y Lealtad</div><div>b) Finalidad</div>
+ <div>c) Proporcionalidad</div><div>d) Calidad</div>
+ <div>e) Responsabilidad</div><div>f) Seguridad</div>
+ <div>g) Transparencia</div><div>h) Confidencialidad</div>
+ </div>
+ </div>
+ </div>
+ <!-- Normativa panel -->
+ <div class="al-panel" id="al-norm" style="overflow-y:auto;padding:20px;background:#F4F7FB">
+ <h3 style="color:#0B2B5C;font-family:'Syne',sans-serif;font-size:18px;margin-bottom:16px">Base Normativa Chilena</h3>
+ <div style="display:flex;flex-direction:column;gap:10px">
+ <div style="background:#fff;border:1px solid #B8D0EE;padding:14px;border-radius:4px"><strong style="color:#0B2B5C">Código del Trabajo · DFL N°1/2003</strong><p style="font-size:12px;color:#4A5568;margin-top:4px">Arts. 159-163 (causales término), Arts. 174 (fuero), procedimientos</p></div>
+ <div style="background:#fff;border:1px solid #B8D0EE;padding:14px;border-radius:4px"><strong style="color:#0B2B5C">Código Civil · Libro IV</strong><p style="font-size:12px;color:#4A5568;margin-top:4px">Contratos, responsabilidad extracontractual Art. 2314, arrendamiento Art. 1915</p></div>
+ <div style="background:#fff;border:1px solid #B8D0EE;padding:14px;border-radius:4px"><strong style="color:#0B2B5C">Ley 21.459 · Delitos Informáticos</strong><p style="font-size:12px;color:#4A5568;margin-top:4px">Acceso no autorizado, sabotaje, interceptación, fraude informático. Convenio de Budapest.</p></div>
+ <div style="background:#fff;border:1px solid #B8D0EE;padding:14px;border-radius:4px"><strong style="color:#0B2B5C">Ley 19.628 · Datos Personales (vigente)</strong><p style="font-size:12px;color:#4A5568;margin-top:4px">Marco actual hasta diciembre 2026. Será reemplazada progresivamente por Ley 21.719.</p></div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- ANONIMIZADOR -->
+ <div class="win" id="win-anon" style="top:90px;left:130px;width:880px;height:640px">
+ <div class="win-titlebar" data-win="anon">
+ <div class="win-controls">
+ <button class="win-ctrl wc-close" onclick="closeWin('anon')"></button>
+ <button class="win-ctrl wc-min" onclick="minimizeWin('anon')"></button>
+ <button class="win-ctrl wc-max" onclick="maximizeWin('anon')"></button>
+ </div>
+ <span class="win-title">Anonimizador PII — Ley 21.719 | VibeCodingChile</span>
+ </div>
+ <div class="win-body">
+ <div class="anon-shell">
+ <div class="anon-nav">
+ <span style="font-size:24px"></span>
+ <div>
+ <div class="anon-title">Anonimizador de Datos Personales</div>
+ <div style="font-size:11px;color:rgba(255,255,255,.65)">Ley 21.719 · Chile · Detección automática de PII</div>
+ </div>
+ <span class="anon-badge">Ley 21.719</span>
+ </div>
+ <div class="anon-body">
+ <div class="anon-tags">
+ <span class="anon-tag anon-tag-active" onclick="toggleAnonTag(this,'rut')"> RUT</span>
+ <span class="anon-tag anon-tag-active" onclick="toggleAnonTag(this,'phone')"> Teléfono</span>
+ <span class="anon-tag anon-tag-active" onclick="toggleAnonTag(this,'email')"> Email</span>
+ <span class="anon-tag anon-tag-active" onclick="toggleAnonTag(this,'address')"> Dirección</span>
+ <span class="anon-tag anon-tag-active" onclick="toggleAnonTag(this,'name')"> Nombre</span>
+ <span class="anon-tag anon-tag-active" onclick="toggleAnonTag(this,'plate')"> Patente</span>
+ </div>
+ <textarea class="anon-textarea" id="anon-input" placeholder="Pega aquí el texto con datos personales que quieres anonimizar...&#10;&#10;Ejemplo: El señor Juan García Pérez, RUT 12.345.678-9, domiciliado en Av. Providencia 1234, Santiago, teléfono +56 9 1234 5678, correo juan.garcia@empresa.cl, solicitó..."></textarea>
+ <div class="anon-btn-row">
+ <button class="anon-btn-blue" onclick="anonimizar()"> Anonimizar texto</button>
+ <button class="anon-btn-outline" onclick="anonClear()">✕ Limpiar</button>
+ <button class="anon-btn-outline" onclick="anonLoadExample()"> Cargar ejemplo</button>
+ </div>
+ <div class="anon-result" id="anon-result" style="display:none"></div>
+ <div class="anon-stats-row" id="anon-stats" style="display:none">
+ <div class="anon-stat-box"><div class="anon-stat-n" id="anon-stat-total">0</div><div class="anon-stat-l">Datos detectados</div></div>
+ <div class="anon-stat-box"><div class="anon-stat-n" id="anon-stat-types">0</div><div class="anon-stat-l">Tipos distintos</div></div>
+ <div class="anon-stat-box"><div class="anon-stat-n" id="anon-stat-riesgo">BAJO</div><div class="anon-stat-l">Nivel de riesgo</div></div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- TERMINAL -->
+ <div class="win" id="win-terminal" style="top:150px;left:200px;width:700px;height:430px">
+ <div class="win-titlebar" data-win="terminal">
+ <div class="win-controls">
+ <button class="win-ctrl wc-close" onclick="closeWin('terminal')"></button>
+ <button class="win-ctrl wc-min" onclick="minimizeWin('terminal')"></button>
+ <button class="win-ctrl wc-max" onclick="maximizeWin('terminal')"></button>
+ </div>
+ <span class="win-title">Terminal — vibeOS@chile: ~</span>
+ </div>
+ <div class="win-body">
+ <div class="term-shell">
+ <div class="term-output" id="term-output">
+ <div class="term-line"><span class="term-ok">VibeOS Terminal v2.6.1 — VibeCodingChile</span></div>
+ <div class="term-line term-out">Type 'help' for available commands</div>
+ <div class="term-line">&nbsp;</div>
+ </div>
+ <div class="term-input-row">
+ <span class="term-prompt-static">vibeOS@chile:~$ </span>
+ <input class="term-input" id="term-input" placeholder="" onkeydown="termKeydown(event)" autofocus>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- ABOUT -->
+ <div class="win" id="win-about" style="top:180px;left:300px;width:440px;height:340px">
+ <div class="win-titlebar" data-win="about">
+ <div class="win-controls">
+ <button class="win-ctrl wc-close" onclick="closeWin('about')"></button>
+ <button class="win-ctrl wc-min" onclick="minimizeWin('about')"></button>
+ <button class="win-ctrl wc-max" onclick="maximizeWin('about')"></button>
+ </div>
+ <span class="win-title">Acerca de VibeOS</span>
+ </div>
+ <div class="win-body">
+ <div class="about-shell">
+ <div class="about-logo"></div>
+ <div class="about-name">VibeOS</div>
+ <div class="about-sub">VibeCodingChile Platform · v2.6.1</div>
+ <div class="about-divider"></div>
+ <div class="about-info">
+ Sistema operativo de agentes IA para el mercado legal chileno<br>
+ Derecho + Código · Santiago, Chile <br>
+ Certificado: Claude AI · Amazon Bedrock · Google Vertex<br>
+ MCP · AI Fluency · Claude Code
+ </div>
+ <div class="about-links">
+ <span class="about-link">vibecodingchile.cl</span>
+ <span class="about-link">Legalizes</span>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- Dock -->
+ <div id="dock">
+ <div class="dock-icon" onclick="openWin('legalizes')" id="di-legalizes"><span>LG</span><span class="dock-label">Legalizes</span></div>
+ <div class="dock-icon" onclick="openWin('agentOS')" id="di-agentOS"><span>OS</span><span class="dock-label">Agent OS</span></div>
+ <div class="dock-icon" onclick="openWin('wizard')" id="di-wizard"><span>WZ</span><span class="dock-label">Wizard</span></div>
+ <div class="dock-icon" onclick="openWin('agente')" id="di-agente"><span>AJ</span><span class="dock-label">Agente</span></div>
+ <div class="dock-icon" onclick="openWin('anon')" id="di-anon"><span>AN</span><span class="dock-label">Anon PII</span></div>
+ <div class="dock-sep"></div>
+ <div class="dock-icon" onclick="openWin('terminal')" id="di-terminal"><span>>_</span><span class="dock-label">Terminal</span></div>
+ <div class="dock-icon" onclick="toggleAbout()" id="di-about"><span>i</span><span class="dock-label">Acerca de</span></div>
+ </div>
+
+ <!-- Context Menu -->
+ <div id="ctx-menu">
+ <div class="ctx-item" onclick="openWin('legalizes');hideCtx()"> Abrir Legalizes</div>
+ <div class="ctx-item" onclick="openWin('agentOS');hideCtx()"> Abrir Agent OS</div>
+ <div class="ctx-item" onclick="openWin('wizard');hideCtx()"> Compliance Wizard</div>
+ <div class="ctx-sep"></div>
+ <div class="ctx-item" onclick="openWin('terminal');hideCtx()"> Terminal</div>
+ <div class="ctx-sep"></div>
+ <div class="ctx-item" onclick="toggleAbout();hideCtx()"> Acerca de VibeOS</div>
+ </div>
+
+ <!-- Notifications -->
+ <div id="notif"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// BOOT SEQUENCE
+// ═══════════════════════════════════════════════════════
+const bootLines=[
+ 'Iniciando kernel VibeOS 2.6.1...',
+ 'Cargando módulos de agentes IA...',
+ 'Conectando Claude API [claude-sonnet-4]...',
+ 'Inicializando Legalizes Legal Platform...',
+ 'Cargando base normativa chilena...',
+ 'Iniciando Compliance Wizard 21.719...',
+ 'Conectando WhatsApp Business API...',
+ 'Cargando Anonimizador PII...',
+ 'Iniciando Agente Jurídico offline...',
+ 'Sistema listo. Bienvenido.'
+];
+let bIdx=0;
+const bootLinesEl=document.getElementById('boot-lines');
+const bootProg=document.getElementById('boot-progress');
+
+function bootTick(){
+ if(bIdx>=bootLines.length){
+ setTimeout(()=>{
+ document.getElementById('boot').style.opacity='0';
+ document.getElementById('boot').style.transition='opacity .6s ease';
+ setTimeout(()=>{
+ document.getElementById('boot').style.display='none';
+ document.getElementById('desktop').style.display='block';
+ startDesktop();
+ },600);
+ },400);
+ return;
+ }
+ const d=document.createElement('div');
+ d.className='boot-line';
+ d.style.animationDelay=bIdx*0.05+'s';
+ d.textContent='[ OK ] '+bootLines[bIdx];
+ d.style.color=bIdx===bootLines.length-1?'#c8f065':'#8b949e';
+ bootLinesEl.appendChild(d);
+ bootProg.style.width=((bIdx+1)/bootLines.length*100)+'%';
+ bIdx++;
+ setTimeout(bootTick,200+Math.random()*100);
+}
+bootTick();
+
+// ═══════════════════════════════════════════════════════
+// DESKTOP INIT
+// ═══════════════════════════════════════════════════════
+function startDesktop(){
+ updateClock();
+ setInterval(updateClock,1000);
+ initWizard();
+ setTimeout(()=>showNotif('','VibeOS listo','6 agentes IA activos. Bienvenido.'),800);
+ setTimeout(()=>openWin('agentOS'),1200);
+}
+
+function updateClock(){
+ const n=new Date();
+ document.getElementById('clock').textContent=
+ n.toLocaleDateString('es-CL',{weekday:'short',day:'2-digit',month:'short'})+' '+
+ n.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+}
+
+// ═══════════════════════════════════════════════════════
+// WINDOW MANAGEMENT
+// ═══════════════════════════════════════════════════════
+let zCounter=1000;
+const winStates={};
+const taskbarApps=document.getElementById('taskbar-apps');
+
+const winMeta={
+ legalizes:{title:' Legalizes',id:'win-legalizes'},
+ agentOS:{title:' Agent OS',id:'win-agentOS'},
+ wizard:{title:' Wizard 21.719',id:'win-wizard'},
+ agente:{title:' Agente Jurídico',id:'win-agente'},
+ anon:{title:' Anonimizador',id:'win-anon'},
+ terminal:{title:' Terminal',id:'win-terminal'},
+ about:{title:' VibeOS',id:'win-about'},
+};
+
+function openWin(name){
+ const meta=winMeta[name];
+ if(!meta)return;
+ const el=document.getElementById(meta.id);
+ if(!el)return;
+ el.classList.add('visible');
+ el.style.display='flex';
+ focusWin(el);
+ winStates[name]='open';
+ const di=document.getElementById('di-'+name);
+ if(di)di.classList.add('open');
+ updateTaskbar(name,'open');
+}
+
+function closeWin(name){
+ const meta=winMeta[name];
+ if(!meta)return;
+ const el=document.getElementById(meta.id);
+ if(!el)return;
+ el.classList.remove('visible');
+ el.style.display='none';
+ winStates[name]='closed';
+ const di=document.getElementById('di-'+name);
+ if(di)di.classList.remove('open');
+ updateTaskbar(name,'closed');
+}
+
+function minimizeWin(name){
+ const meta=winMeta[name];
+ if(!meta)return;
+ const el=document.getElementById(meta.id);
+ if(!el)return;
+ el.style.display='none';
+ winStates[name]='minimized';
+ updateTaskbar(name,'minimized');
+}
+
+function maximizeWin(name){
+ const meta=winMeta[name];
+ if(!meta)return;
+ const el=document.getElementById(meta.id);
+ if(!el)return;
+ if(el._maximized){
+ Object.assign(el.style,el._prevRect);
+ el._maximized=false;
+ }else{
+ el._prevRect={top:el.style.top,left:el.style.left,width:el.style.width,height:el.style.height};
+ Object.assign(el.style,{top:'38px',left:'0',width:'100vw',height:'calc(100vh - 38px - 72px)'});
+ el._maximized=true;
+ }
+ focusWin(el);
+}
+
+function focusWin(el){
+ document.querySelectorAll('.win').forEach(w=>w.classList.remove('focused'));
+ el.style.zIndex=++zCounter;
+ el.classList.add('focused');
+}
+
+function updateTaskbar(name,state){
+ const existing=document.getElementById('tb-'+name);
+ const meta=winMeta[name];
+ if(!meta)return;
+ if(state==='closed'){
+ if(existing)existing.remove();
+ return;
+ }
+ if(!existing){
+ const btn=document.createElement('div');
+ btn.className='taskbar-btn'+(state==='open'?' active':'');
+ btn.id='tb-'+name;
+ btn.innerHTML='<span class="dot"></span>'+meta.title;
+ btn.onclick=()=>{
+ const el=document.getElementById(meta.id);
+ if(!el)return;
+ if(el.style.display==='none'||winStates[name]==='minimized'){
+ el.style.display='flex';
+ winStates[name]='open';
+ btn.classList.add('active');
+ focusWin(el);
+ }else{
+ minimizeWin(name);
+ btn.classList.remove('active');
+ }
+ };
+ taskbarApps.appendChild(btn);
+ }else{
+ if(state==='open')existing.classList.add('active');
+ else existing.classList.remove('active');
+ }
+}
+
+function toggleAbout(){
+ if(winStates.about==='open')closeWin('about');
+ else openWin('about');
+}
+
+// Drag
+document.querySelectorAll('.win-titlebar').forEach(tb=>{
+ let ox,oy,sx,sy,dragging=false;
+ tb.addEventListener('mousedown',e=>{
+ const win=tb.closest('.win');
+ if(!win)return;
+ focusWin(win);
+ dragging=true;
+ sx=e.clientX;sy=e.clientY;
+ ox=win.offsetLeft;oy=win.offsetTop;
+ e.preventDefault();
+ });
+ document.addEventListener('mousemove',e=>{
+ if(!dragging)return;
+ const win=tb.closest('.win');
+ if(!win)return;
+ const dx=e.clientX-sx,dy=e.clientY-sy;
+ win.style.left=(ox+dx)+'px';
+ win.style.top=Math.max(38,oy+dy)+'px';
+ });
+ document.addEventListener('mouseup',()=>{dragging=false});
+});
+
+// Focus on click
+document.querySelectorAll('.win').forEach(w=>{
+ w.addEventListener('mousedown',()=>focusWin(w));
+});
+
+// Context menu
+document.getElementById('desktop').addEventListener('contextmenu',e=>{
+ e.preventDefault();
+ const m=document.getElementById('ctx-menu');
+ m.style.display='block';
+ m.style.left=Math.min(e.clientX,window.innerWidth-200)+'px';
+ m.style.top=Math.min(e.clientY,window.innerHeight-200)+'px';
+});
+document.addEventListener('click',hideCtx);
+function hideCtx(){document.getElementById('ctx-menu').style.display='none'}
+
+// ═══════════════════════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════════════════════
+function showNotif(icon,title,body){
+ const c=document.getElementById('notif');
+ const t=document.createElement('div');
+ t.className='notif-toast fade';
+ t.innerHTML=`<span class="notif-icon">${icon}</span><div><div class="notif-title">${title}</div><div class="notif-body">${body}</div></div><span class="notif-close" onclick="this.parentElement.remove()">✕</span>`;
+ c.appendChild(t);
+ setTimeout(()=>t.remove(),5000);
+}
+
+// ═══════════════════════════════════════════════════════
+// LEGALIZES APP
+// ═══════════════════════════════════════════════════════
+const LEG_RESPONSES={
+ 'Art. 159':()=>`**Art. 159 — Código del Trabajo Chile**\n\nCausales de término de contrato:\n1. Mutuo acuerdo de las partes\n2. Renuncia voluntaria (30 días anticipación)\n3. Muerte del trabajador\n4. Vencimiento del plazo convenido\n5. Conclusión del trabajo o servicio\n6. Caso fortuito o fuerza mayor\n\n*Fuente: DFL N°1/2003, Art. 159*`,
+ 'Ley 19.628':()=>`**Ley 19.628 — Protección de la Vida Privada**\n\nPrincipios fundamentales:\n- **Consentimiento**: Tratamiento requiere autorización expresa del titular\n- **Finalidad**: Datos solo para el fin declarado\n- **Proporcionalidad**: Solo datos necesarios\n\nDerechos: Acceso, Rectificación, Cancelación, Bloqueo\n\n*Vigente hasta diciembre 2026, reemplazada por Ley 21.719*`,
+ 'Ley 21.719':()=>`**Ley 21.719 — Nueva Ley de Datos Personales**\n\n Vigencia plena: **1 de diciembre de 2026**\n\n**Principales novedades:**\n- Agencia de Protección de Datos Personales (APDP)\n- Derechos ARCOP ampliados + portabilidad\n- Multas hasta 10.000 UTM por infracción grave\n- Consentimiento inequívoco y específico\n- Data breach notification en 72h\n\n*Art. 1° Transitorio — Publicada 13/12/2024*`,
+ default:()=>`Basándome en la legislación chilena vigente:\n\n**Marco Normativo Aplicable**\n\nEl ordenamiento jurídico chileno establece un marco regulatorio comprehensivo para esta materia, consagrado en el Código Civil y legislación especial.\n\n**Aspectos Principales**\n\n1. **Requisitos formales**: La normativa exige cumplimiento de formalidades específicas\n2. **Plazos**: Se deben observar los plazos legales bajo riesgo de prescripción\n3. **Consecuencias**: El incumplimiento acarrea responsabilidades civiles\n\n*Fuentes: Código Civil, Código del Trabajo, jurisprudencia Corte Suprema*`
+};
+
+function legNav(view,el){
+ document.querySelectorAll('.leg-nav-item').forEach(i=>i.classList.remove('active'));
+ el.classList.add('active');
+ document.querySelectorAll('.leg-page').forEach(p=>{p.classList.remove('active');p.style.display='none';});
+ const pg=document.getElementById('leg-'+view);
+ if(pg){pg.classList.add('active');pg.style.display=view==='chat'?'flex':'block';}
+}
+
+function legSend(){
+ const inp=document.getElementById('leg-chat-input');
+ const msg=inp.value.trim();
+ if(!msg)return;
+ const msgs=document.getElementById('leg-msgs');
+ const sugArea=document.getElementById('leg-sug-area');
+ if(sugArea)sugArea.style.display='none';
+ const userEl=document.createElement('div');
+ userEl.className='leg-msg-user fade';
+ userEl.textContent=msg;
+ msgs.appendChild(userEl);
+ inp.value='';
+ const typing=document.createElement('div');
+ typing.className='leg-typing fade';
+ typing.innerHTML='<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+ msgs.appendChild(typing);
+ msgs.scrollTop=msgs.scrollHeight;
+ setTimeout(()=>{
+ typing.remove();
+ const key=Object.keys(LEG_RESPONSES).find(k=>msg.toLowerCase().includes(k.toLowerCase()))||'default';
+ const resp=LEG_RESPONSES[key]||LEG_RESPONSES.default;
+ const aiEl=document.createElement('div');
+ aiEl.className='leg-msg-ai fade';
+ aiEl.innerHTML=resp().replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+ msgs.appendChild(aiEl);
+ msgs.scrollTop=msgs.scrollHeight;
+ },1200+Math.random()*800);
+}
+
+function legSuggest(el){
+ document.getElementById('leg-chat-input').value=el.textContent;
+ legSend();
+}
+
+// ═══════════════════════════════════════════════════════
+// AGENT OS
+// ═══════════════════════════════════════════════════════
+function osNav(page,el){
+ document.querySelectorAll('.os-nav-item').forEach(i=>i.classList.remove('active'));
+ el.classList.add('active');
+ document.querySelectorAll('.os-page').forEach(p=>p.classList.remove('active'));
+ const pg=document.getElementById('os-'+page);
+ if(pg)pg.classList.add('active');
+ const titles={dashboard:['Dashboard','Visión general del sistema'],agents:['Agentes IA','6 agentes desplegados'],pipelines:['Pipelines','Flujos de procesamiento activos'],whatsapp:['WhatsApp API','Twilio Business API'],claude:['Claude API','Anthropic — Sonnet 4'],logs:['System Logs','Registro del sistema'],settings:['Configuración','Parámetros del sistema']};
+ const t=titles[page]||['',''];
+ document.getElementById('os-page-title').textContent=t[0];
+ document.getElementById('os-page-sub').textContent=t[1];
+}
+
+function clearLogs(){
+ document.getElementById('os-logs-body').innerHTML='<div style="color:var(--text3);font-size:11px">Logs limpiados.</div>';
+}
+
+// ═══════════════════════════════════════════════════════
+// COMPLIANCE WIZARD
+// ═══════════════════════════════════════════════════════
+const WIZ_STEPS_DATA=[
+ {label:'Empresa',icon:'1'},
+ {label:'Datos',icon:'2'},
+ {label:'WhatsApp',icon:'3'},
+ {label:'Seguridad',icon:'4'},
+ {label:'Resultado',icon:'5'},
+];
+
+const REQS=[
+ {id:'consentimiento',art:'Art. 12',title:'Consentimiento explícito',wa:'En WhatsApp: opt-in antes de cualquier comunicación comercial.',weight:3},
+ {id:'finalidad',art:'Art. 13',title:'Principio de finalidad',wa:'No usar datos del bot para fines distintos al declarado.',weight:2},
+ {id:'minimizacion',art:'Art. 14',title:'Minimización de datos',wa:'No solicitar RUT u otros datos no necesarios en el chatbot.',weight:2},
+ {id:'seguridad',art:'Art. 15',title:'Medidas de seguridad',wa:'Cifrado en tránsito (WA API) + seguridad en backend.',weight:3},
+ {id:'derechos',art:'Art. 19-23',title:'Derechos ARCOP',wa:'Comando /mis-datos en el bot para ejercer derechos.',weight:3},
+ {id:'responsable',art:'Art. 9',title:'Responsable del tratamiento',wa:'Identificar empresa y contacto en el mensaje de bienvenida.',weight:2},
+];
+
+let wizStep=0;
+let wizData={company:'',sector:'',size:'',dataType:'',hasWA:'',answers:{}};
+
+function initWizard(){
+ renderWizStep();
+}
+
+function renderWizStep(){
+ // Update step circles
+ WIZ_STEPS_DATA.forEach((_,i)=>{
+ const c=document.getElementById('wsc-'+i);
+ const l=document.getElementById('wsl-'+i);
+ if(c){
+ c.className='wiz-step-circle';
+ if(i<wizStep){c.classList.add('done');c.textContent='✓';}
+ else if(i===wizStep){c.classList.add('current');c.textContent=WIZ_STEPS_DATA[i].icon;}
+ else{c.textContent=WIZ_STEPS_DATA[i].icon;}
+ }
+ if(l)l.className='wiz-step-line'+(i<wizStep?' done':'');
+ });
+ const back=document.getElementById('wiz-back');
+ const next=document.getElementById('wiz-next');
+ if(back)back.style.display=wizStep>0?'block':'none';
+ if(next)next.textContent=wizStep===4?'✓ Nueva auditoría':'Continuar →';
+
+ const content=document.getElementById('wiz-step-content');
+ if(!content)return;
+ if(wizStep===0){
+ content.innerHTML=`<div class="wiz-card"><div class="wiz-title">Información de la empresa</div><div class="wiz-subtitle">Cuéntanos sobre tu organización para calibrar la evaluación.</div><label class="wiz-label">Nombre de la empresa</label><input class="wiz-input" id="wf-company" placeholder="Torres & Asociados SpA" value="${wizData.company||''}"><label class="wiz-label">Sector / Industria</label><select class="wiz-select" id="wf-sector"><option value="">Selecciona...</option><option>Estudio Jurídico</option><option>Tecnología</option><option>Retail</option><option>Salud</option><option>Servicios Financieros</option><option>Educación</option></select><label class="wiz-label" style="margin-top:10px;margin-bottom:10px">Tamaño</label><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><div class="wiz-option${wizData.size==='micro'?' sel':''}" onclick="wizSel(this,'size','micro')"><span style="font-size:18px"></span><div><div style="font-weight:600;font-size:13px;color:#E8EAF2">1–10</div><div style="font-size:11px;color:#8890AA">Micro/Startup</div></div></div><div class="wiz-option${wizData.size==='pyme'?' sel':''}" onclick="wizSel(this,'size','pyme')"><span style="font-size:18px"></span><div><div style="font-weight:600;font-size:13px;color:#E8EAF2">11–200</div><div style="font-size:11px;color:#8890AA">PyME</div></div></div><div class="wiz-option${wizData.size==='grande'?' sel':''}" onclick="wizSel(this,'size','grande')"><span style="font-size:18px"></span><div><div style="font-weight:600;font-size:13px;color:#E8EAF2">200+</div><div style="font-size:11px;color:#8890AA">Grande</div></div></div></div></div>`;
+ }else if(wizStep===1){
+ content.innerHTML=`<div class="wiz-card"><div class="wiz-title">Datos que tratas</div><div class="wiz-subtitle">¿Qué tipo de datos personales maneja tu organización?</div><div class="wiz-option${wizData.dataType==='basic'?' sel':''}" onclick="wizSel(this,'dataType','basic')"><span style="font-size:20px"></span><div><div style="font-weight:600;color:#E8EAF2;font-size:14px">Básicos</div><div style="font-size:12px;color:#8890AA">Nombre, email, RUT — identificación general</div></div></div><div class="wiz-option${wizData.dataType==='sensitive'?' sel-red':''}" onclick="wizSelRed(this,'dataType','sensitive')"><div><div style="font-weight:600;color:#E8EAF2;font-size:14px">Sensibles</div><div style="font-size:12px;color:#8890AA">Salud, biometría, origen étnico, datos financieros</div></div></div><div class="wiz-option${wizData.dataType==='minors'?' sel-red':''}" onclick="wizSelRed(this,'dataType','minors')"><div><div style="font-weight:600;color:#E8EAF2;font-size:14px">Menores de edad</div><div style="font-size:12px;color:#8890AA">Cualquier dato de personas menores de 18 años</div></div></div></div>`;
+ }else if(wizStep===2){
+ content.innerHTML=`<div class="wiz-card"><div class="wiz-title">WhatsApp Business API</div><div class="wiz-subtitle">La Ley 21.719 aplica expresamente a tratamiento vía mensajería. ¿Usas WhatsApp en tu operación?</div><div class="wiz-option${wizData.hasWA==='yes'?' sel':''}" onclick="wizSel(this,'hasWA','yes')"><div><div style="font-weight:600;color:#E8EAF2;font-size:14px">Sí, uso WhatsApp Business API</div><div style="font-size:12px;color:#8890AA">Chatbot, notificaciones o atención vía WhatsApp</div></div></div><div class="wiz-option${wizData.hasWA==='no'?' sel':''}" onclick="wizSel(this,'hasWA','no')"><span style="font-size:20px">✗</span><div><div style="font-weight:600;color:#E8EAF2;font-size:14px">No uso WhatsApp</div><div style="font-size:12px;color:#8890AA">Solo canales web, email o presencial</div></div></div></div>`;
+ }else if(wizStep===3){
+ let rows='';
+ REQS.forEach(r=>{
+ const ans=wizData.answers[r.id]||'';
+ rows+=`<div style="background:#0D0E14;border:1px solid #1A1D28;border-radius:10px;padding:14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><div><span style="font-size:12px;font-weight:700;color:#00E5A0;font-family:'DM Mono',monospace">${r.art}</span> <span style="font-size:13px;font-weight:600;color:#E8EAF2">${r.title}</span></div>${wizData.hasWA==='yes'?'<span style="padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;background:rgba(37,211,102,.12);color:#25D366;border:1px solid rgba(37,211,102,.2)">WhatsApp</span>':''}</div>${wizData.hasWA==='yes'?`<p style="font-size:11px;color:#8890AA;margin-bottom:10px">${r.wa}</p>`:''}<div class="wiz-check-row"><button class="wiz-check-btn${ans==='yes'?' yes':''}" onclick="wizAns('${r.id}','yes',this)">✓ Sí / Implementado</button><button class="wiz-check-btn${ans==='partial'?' partial':''}" onclick="wizAns('${r.id}','partial',this)">⬠ Parcial</button><button class="wiz-check-btn${ans==='no'?' no':''}" onclick="wizAns('${r.id}','no',this)">✗ No / Pendiente</button></div></div>`;
+ });
+ content.innerHTML=`<div class="wiz-card"><div class="wiz-title">Chequeo de cumplimiento</div><div class="wiz-subtitle">Evalúa cada requisito de la Ley 21.719.</div>${rows}</div>`;
+ }else if(wizStep===4){
+ const score=calcWizScore();
+ const {level,color,label,emoji}=getRiskLevel(score);
+ const fills=Math.round(score/100*12);
+ let bars='';
+ for(let i=0;i<12;i++)bars+=`<div style="width:14px;height:32px;border-radius:3px;background:${i<fills?color:'#1A1D28'}"></div>`;
+ content.innerHTML=`<div class="wiz-card"><div style="text-align:center;margin-bottom:20px"><span class="risk-badge risk-${level==='BAJO'?'ok':level==='MEDIO'?'warn':'high'}">${emoji} Riesgo ${level}</span><div style="font-family:'Syne',sans-serif;font-size:48px;font-weight:800;color:${color};margin:16px 0">${score}<span style="font-size:24px">%</span></div><div style="font-size:14px;color:#8890AA">${label}</div></div><div style="display:flex;gap:4px;justify-content:center;margin-bottom:20px">${bars}</div><div class="progress-track"><div class="progress-fill" style="width:${score}%;background:${color}"></div></div><div style="margin-top:20px;display:flex;flex-direction:column;gap:8px">${REQS.map(r=>{const a=wizData.answers[r.id]||'no';const c=a==='yes'?'#00E5A0':a==='partial'?'#FFD166':'#FF5C7A';const ic=a==='yes'?'✓':a==='partial'?'⬠':'✗';return`<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#0D0E14;border-radius:8px;border:1px solid #1A1D28"><span style="color:${c};font-size:14px;width:16px">${ic}</span><span style="font-size:12px;font-family:'DM Mono',monospace;color:#00E5A0;width:72px">${r.art}</span><span style="font-size:12px;color:#E8EAF2">${r.title}</span></div>`;}).join('')}</div></div>`;
+ if(score>=80)showNotif('','Compliance Wizard','Cumplimiento sólido detectado. '+score+'%');
+ else if(score>=50)showNotif('','Compliance Wizard','Ajustes requeridos. '+score+'% cumplimiento.');
+ else showNotif('','Compliance Wizard','Acción urgente. Solo '+score+'% cumplimiento.');
+ }
+}
+
+function wizSel(el,key,val){
+ wizData[key]=val;
+ el.parentElement.querySelectorAll('.wiz-option').forEach(o=>{o.classList.remove('sel','sel-red')});
+ el.classList.add('sel');
+}
+function wizSelRed(el,key,val){
+ wizData[key]=val;
+ el.parentElement.querySelectorAll('.wiz-option').forEach(o=>{o.classList.remove('sel','sel-red')});
+ el.classList.add('sel-red');
+}
+function wizAns(id,val,btn){
+ wizData.answers[id]=val;
+ const row=btn.parentElement;
+ row.querySelectorAll('.wiz-check-btn').forEach(b=>{b.classList.remove('yes','partial','no')});
+ btn.classList.add(val);
+}
+function wizNext(){
+ if(wizStep===0){const c=document.getElementById('wf-company');if(c)wizData.company=c.value;const s=document.getElementById('wf-sector');if(s)wizData.sector=s.value;}
+ if(wizStep<4)wizStep++;
+ else{wizStep=0;wizData={company:'',sector:'',size:'',dataType:'',hasWA:'',answers:{}};}
+ renderWizStep();
+ document.getElementById('wiz-shell').scrollTo({top:0,behavior:'smooth'});
+}
+function wizBack(){if(wizStep>0){wizStep--;renderWizStep();}}
+function calcWizScore(){
+ let score=0,max=0;
+ REQS.forEach(r=>{max+=r.weight*2;const a=wizData.answers[r.id];if(a==='yes')score+=r.weight*2;else if(a==='partial')score+=r.weight;});
+ return max>0?Math.round((score/max)*100):0;
+}
+function getRiskLevel(score){
+ if(score>=80)return{level:'BAJO',color:'#00E5A0',label:'Cumplimiento sólido',emoji:''};
+ if(score>=50)return{level:'MEDIO',color:'#FFD166',label:'Ajustes requeridos',emoji:''};
+ return{level:'ALTO',color:'#FF5C7A',label:'Acción urgente',emoji:''};
+}
+
+// ═══════════════════════════════════════════════════════
+// AGENTE JURIDICO
+// ═══════════════════════════════════════════════════════
+const AL_KB={
+ 'vigencia':'**Vigencia Ley 21.719:**\nPublicada: **13 de diciembre de 2024**\nVigencia plena: **1 de diciembre de 2026** (24 meses post publicación)\n→ Art. 1° Transitorio',
+ 'cuándo':'**Vigencia Ley 21.719:**\nPublicada: **13 de diciembre de 2024**\nVigencia plena: **1 de diciembre de 2026**\n→ Art. 1° Transitorio',
+ 'sensibles':'**Datos Sensibles (Art. 2° literal g):**\n- Origen étnico o racial\n- Afiliación política, sindical\n- Situación socioeconómica\n- Convicciones ideológicas o filosóficas\n- Creencias religiosas\n- Datos de salud y perfil biológico\n- Datos biométricos\n- Vida sexual, orientación sexual\n→ Requieren consentimiento EXPRESO (Art. 16°)',
+ 'arcop':'**Derechos ARCOP del Titular (Art. 4°):**\n- **A**cceso a sus datos\n- **R**ectificación de datos incorrectos\n- **C**ancelación / supresión\n- **O**posición al tratamiento\n- **P**ortabilidad de datos\n\nPlazo de respuesta: **30 días hábiles**\nSon personales, intransferibles e irrenunciables.',
+ 'multas':'**Sanciones Ley 21.719:**\n- Infracciones leves: hasta **1.000 UTM**\n- Infracciones graves: hasta **5.000 UTM**\n- Infracciones gravísimas: hasta **10.000 UTM**\n\n**Agravantes:**\n- Datos sensibles: sanción x2\n- Reincidencia: sanción x3\n\n*~$6.8M USD por infracción gravísima*',
+ 'responsable':'**Responsable del Tratamiento (Art. 9°):**\nPersona natural o jurídica que determina los fines y medios del tratamiento.\n\n**Obligaciones:**\n- Informar al titular en el momento de recolección\n- Implementar medidas técnicas y organizativas\n- Mantener registro de actividades\n- Designar delegado si aplica',
+ 'default':'Basándome en la **Ley 21.719** de Chile y normativa vigente:\n\nEsta ley moderniza el marco de protección de datos personales, alineándose con estándares internacionales (GDPR europeo). Sus pilares son: consentimiento inequívoco, derechos ARCOP del titular, y una nueva Agencia de Protección de Datos.\n\n*¿Deseas información más específica sobre algún artículo o concepto?*'
+};
+
+function alPanel(name,el){
+ document.querySelectorAll('.al-tab').forEach(t=>t.classList.remove('active'));
+ el.classList.add('active');
+ document.querySelectorAll('.al-panel').forEach(p=>p.classList.remove('active'));
+ const panel=document.getElementById('al-'+name);
+ if(panel)panel.classList.add('active');
+}
+
+function alSend(){
+ const inp=document.getElementById('al-input');
+ const msg=inp.value.trim();
+ if(!msg)return;
+ const msgs=document.getElementById('al-msgs');
+ msgs.innerHTML+=`<div class="al-msg-row user"><div class="al-avatar al-av-user">U</div><div class="al-bubble al-bubble-user">${msg}</div></div>`;
+ inp.value='';
+ msgs.scrollTop=msgs.scrollHeight;
+ setTimeout(()=>{
+ const key=Object.keys(AL_KB).find(k=>msg.toLowerCase().includes(k.toLowerCase()))||'default';
+ const resp=AL_KB[key]||AL_KB.default;
+ msgs.innerHTML+=`<div class="al-msg-row"><div class="al-avatar al-av-bot"></div><div class="al-bubble al-bubble-bot">${resp.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div></div>`;
+ msgs.scrollTop=msgs.scrollHeight;
+ },900+Math.random()*600);
+}
+
+function alSuggest(btn){
+ document.getElementById('al-input').value=btn.textContent;
+ alSend();
+}
+
+// ═══════════════════════════════════════════════════════
+// ANONIMIZADOR
+// ═══════════════════════════════════════════════════════
+let anonTags={rut:true,phone:true,email:true,address:true,name:true,plate:true};
+
+function toggleAnonTag(el,tag){
+ anonTags[tag]=!anonTags[tag];
+ el.className='anon-tag '+(anonTags[tag]?'anon-tag-active':'anon-tag-inactive');
+}
+
+function anonimizar(){
+ let text=document.getElementById('anon-input').value;
+ if(!text.trim())return;
+ let detections=0;const types=new Set();
+
+ if(anonTags.rut){const r=/\b\d{1,2}\.?\d{3}\.?\d{3}-?[\dkK]\b/g;const m=text.match(r)||[];if(m.length){detections+=m.length;types.add('RUT');text=text.replace(r,'[RUT ANONIMIZADO]');}}
+ if(anonTags.email){const r=/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;const m=text.match(r)||[];if(m.length){detections+=m.length;types.add('Email');text=text.replace(r,'[EMAIL ANONIMIZADO]');}}
+ if(anonTags.phone){const r=/(\+?56\s?)?[29]\s?\d{4}\s?\d{4}|\+?56\s?9\s?\d{4}\s?\d{4}/g;const m=text.match(r)||[];if(m.length){detections+=m.length;types.add('Teléfono');text=text.replace(r,'[TELÉFONO ANONIMIZADO]');}}
+ if(anonTags.plate){const r=/\b[A-Z]{2,4}-?\d{2,4}\b/g;const m=text.match(r)||[];if(m.length){detections+=m.length;types.add('Patente');text=text.replace(r,'[PATENTE ANONIMIZADA]');}}
+ if(anonTags.name){const namePatterns=[/señor[a]?\s+[A-ZÁÉÍÓÚ][a-záéíóú]+\s+[A-ZÁÉÍÓÚ][a-záéíóú]+(\s+[A-ZÁÉÍÓÚ][a-záéíóú]+)?/gi,/don[a]?\s+[A-ZÁÉÍÓÚ][a-záéíóú]+/gi];namePatterns.forEach(r=>{const m=text.match(r)||[];if(m.length){detections+=m.length;types.add('Nombre');text=text.replace(r,'[NOMBRE ANONIMIZADO]');}});}
+ if(anonTags.address){const r=/[AÁ]v(enida|\.)\s+[A-ZÁÉÍÓÚ][^,]+\d+/gi;const m=text.match(r)||[];if(m.length){detections+=m.length;types.add('Dirección');text=text.replace(r,'[DIRECCIÓN ANONIMIZADA]');}}
+
+ const result=document.getElementById('anon-result');
+ result.style.display='block';
+ result.textContent=text;
+
+ const stats=document.getElementById('anon-stats');
+ stats.style.display='grid';
+ document.getElementById('anon-stat-total').textContent=detections;
+ document.getElementById('anon-stat-types').textContent=types.size;
+ document.getElementById('anon-stat-riesgo').textContent=detections>5?'ALTO':detections>2?'MEDIO':'BAJO';
+ document.getElementById('anon-stat-riesgo').style.color=detections>5?'#C0392B':detections>2?'#E67E22':'#1A7F5A';
+
+ showNotif('','Anonimizador',`${detections} dato(s) anonimizados (${types.size} tipo(s))`);
+}
+
+function anonClear(){
+ document.getElementById('anon-input').value='';
+ document.getElementById('anon-result').style.display='none';
+ document.getElementById('anon-stats').style.display='none';
+}
+
+function anonLoadExample(){
+ document.getElementById('anon-input').value='El señor Juan García Pérez, RUT 12.345.678-9, domiciliado en Av. Providencia 1234, Santiago, teléfono +56 9 1234 5678, correo juan.garcia@empresa.cl. La señora Carmen López Muñoz, RUT 9.876.543-K, email carmen.lopez@mail.com, celebró contrato con la empresa. Placa del vehículo: BCHD-23.';
+}
+
+// ═══════════════════════════════════════════════════════
+// TERMINAL
+// ═══════════════════════════════════════════════════════
+const TERM_CMDS={
+ help:()=>`Comandos disponibles:\n apps — listar aplicaciones\n open <app> — abrir aplicación\n close <app>— cerrar aplicación\n agents — estado de agentes IA\n version — versión del sistema\n clear — limpiar terminal\n date — fecha y hora actual\n whoami — usuario actual\n ls — listar archivos\n ping — ping al servidor`,
+ apps:()=>'Aplicaciones instaladas:\n legalizes — Plataforma Legal IA\n agentOS — Sistema de Agentes\n wizard — Compliance 21.719\n agente — Agente Jurídico\n anon — Anonimizador PII\n terminal — Terminal',
+ version:()=>'VibeOS v2.6.1\nKernel: vibeOS-core 2.6.1\nClaude: claude-sonnet-4-20250514\nBuild: 2026.06.11\nCopyright (c) VibeCodingChile',
+ date:()=>new Date().toLocaleString('es-CL',{timeZone:'America/Santiago',weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'})+'\nZona horaria: America/Santiago (CLT)',
+ whoami:()=>'mat@vibecodingchile\nRol: Licenciado en Ciencias Jurídicas + Desarrollador\nCertificaciones: Claude 101, Claude Code, MCP, Bedrock, Vertex AI',
+ agents:()=>'Estado de agentes:\n ✓ Lex Legal Agent [ACTIVO]\n ✓ Compliance Wizard [ACTIVO]\n ✓ WhatsApp Bot [ACTIVO]\n ✓ Anonimizador PII [ACTIVO]\n ~ Analytics Agent [STANDBY]',
+ ls:()=>'drwxr-xr-x apps/\ndrwxr-xr-x agents/\ndrwxr-xr-x normativa/\n-rw-r--r-- ley21719.kb\n-rw-r--r-- codigo_trabajo.kb\n-rw-r--r-- codigo_civil.kb\n-rw-r--r-- config.json\n-rw-r--r-- README.md',
+ ping:()=>'PING api.anthropic.com\n64 bytes: seq=0 ttl=64 time=42ms\n64 bytes: seq=1 ttl=64 time=38ms\n64 bytes: seq=2 ttl=64 time=41ms\n--- 3 packets transmitted, 3 received, 0% loss',
+ clear:()=>'__CLEAR__',
+};
+
+function termKeydown(e){
+ if(e.key!=='Enter')return;
+ const inp=document.getElementById('term-input');
+ const cmd=inp.value.trim();
+ inp.value='';
+ const out=document.getElementById('term-output');
+ const promptLine=document.createElement('div');
+ promptLine.className='term-line';
+ promptLine.innerHTML=`<span class="term-prompt">vibeOS@chile:~$ </span><span class="term-cmd">${cmd}</span>`;
+ out.appendChild(promptLine);
+
+ let parts=cmd.split(' ');
+ let result='';
+ if(parts[0]==='open'){
+ const app=parts[1];
+ if(winMeta[app]){openWin(app);result=`Abriendo ${winMeta[app].title}...`;}
+ else result=`Error: aplicación '${app}' no encontrada. Usa 'apps' para ver la lista.`;
+ }else if(parts[0]==='close'){
+ const app=parts[1];
+ if(winMeta[app]){closeWin(app);result=`Cerrando ${winMeta[app].title}...`;}
+ else result=`Error: aplicación '${app}' no encontrada.`;
+ }else if(TERM_CMDS[parts[0]]){
+ result=TERM_CMDS[parts[0]]();
+ }else if(cmd.trim()===''){
+ result='';
+ }else{
+ result=`vibeOS: comando no reconocido: '${cmd}'\nEscribe 'help' para ver comandos disponibles.`;
+ }
+
+ if(result==='__CLEAR__'){out.innerHTML='';return;}
+ if(result){
+ result.split('\n').forEach(line=>{
+ const d=document.createElement('div');
+ d.className='term-line';
+ d.innerHTML=`<span class="${line.startsWith('Error')||line.startsWith('vibeOS:')? 'term-err':'term-out'}">${line}</span>`;
+ out.appendChild(d);
+ });
+ }
+ const space=document.createElement('div');space.className='term-line';space.textContent='';
+ out.appendChild(space);
+ out.scrollTop=out.scrollHeight;
+}
+
+// ═══════════════════════════════════════════════════════
+// AI CHAT AGENT — VibeNORMA Legal AI
+// ═══════════════════════════════════════════════════════
+const API_BASE = window.location.hostname === 'localhost'
+  ? 'http://localhost:3001'
+  : window.location.origin.replace('vercel.app','up.railway.app').replace('gobernador','vibenos-api');
+
+let chatHistory = [];
+
+async function chatSend() {
+  const inp = document.getElementById('chat-input');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+  chatAppend('user', msg);
+  chatAppend('assistant', '⏳ Buscando en 28 leyes chilenas...');
+  try {
+    const res = await fetch(`${API_BASE}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, history: chatHistory.slice(-10) })
+    });
+    const data = await res.json();
+    const msgs = document.getElementById('chat-messages');
+    if (msgs.lastChild) msgs.removeChild(msgs.lastChild);
+    chatAppend('assistant', data.reply || data.error, data.sources);
+    chatHistory.push({ role: 'user', content: msg });
+    if (data.reply) chatHistory.push({ role: 'assistant', content: data.reply });
+  } catch (err) {
+    const msgs = document.getElementById('chat-messages');
+    if (msgs.lastChild) msgs.removeChild(msgs.lastChild);
+    chatAppend('assistant', '⚠️ Error conectando con el agente. Backend no disponible.');
+  }
+}
+
+function chatAppend(role, text, sources) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = `chat-msg chat-${role}`;
+  const av = role === 'user' ? '👤' : '🤖';
+  const nm = role === 'user' ? 'Tú' : 'VibeNORMA Agent';
+  let src = sources && sources.length ? `<div class="chat-sources">📚 ${sources.slice(0,4).join(' · ')}</div>` : '';
+  div.innerHTML = `<div class="chat-msg-hd"><span>${av}</span><span class="chat-nm">${nm}</span></div><div class="chat-msg-bd">${(text||'').replace(/\n/g,'<br>')}</div>${src}`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function chatKey(e) { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); chatSend(); } }
+
+// Inject chat styles
+const cs = document.createElement('style');
+cs.textContent = `
+#win-chat{width:400px;height:520px;top:70px;right:30px;z-index:2000}
+.chat-sh{display:flex;flex-direction:column;height:100%;background:#0A0B0F}
+.chat-hd{padding:10px 14px;border-bottom:1px solid #1E2028;display:flex;align-items:center;gap:8px}
+.chat-hd .ch-t{font-family:'Space Mono',monospace;font-size:12px;color:#E8E9EC}
+.chat-hd .ch-s{font-family:'Space Mono',monospace;font-size:9px;color:#5A606B;margin-left:auto}
+#chat-messages{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
+.chat-msg{max-width:92%}.chat-user{align-self:flex-end}.chat-assistant{align-self:flex-start}
+.chat-msg-hd{display:flex;align-items:center;gap:5px;margin-bottom:3px;font-size:9px;color:#5A606B;font-family:'Space Mono',monospace}
+.chat-msg-bd{padding:8px 12px;border-radius:8px;font-size:11.5px;line-height:1.6;color:#E8E9EC}
+.chat-user .chat-msg-bd{background:rgba(138,111,216,0.15);border:1px solid rgba(138,111,216,0.3)}
+.chat-assistant .chat-msg-bd{background:#17191F;border:1px solid #2A2E38}
+.chat-sources{font-family:'Space Mono',monospace;font-size:8px;color:#4C7CE0;margin-top:3px;padding:3px 6px;background:rgba(76,124,224,0.08);border-radius:3px}
+.chat-in{padding:10px;border-top:1px solid #1E2028;display:flex;gap:6px}
+.chat-in input{flex:1;background:#17191F;border:1px solid #2A2E38;color:#E8E9EC;padding:8px 12px;border-radius:6px;font-family:'Space Mono',monospace;font-size:11px;outline:none}
+.chat-in input:focus{border-color:#8A6FD8}
+.chat-in button{background:#8A6FD8;border:none;color:#fff;padding:8px 14px;border-radius:6px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;cursor:pointer}
+.chat-in button:hover{opacity:.85}
+`;
+document.head.appendChild(cs);
+
+// Add chat window to dock
+const chatDockIcon = document.createElement('div');
+chatDockIcon.className = 'dock-icon';
+chatDockIcon.setAttribute('onclick', "openWin('chat')");
+chatDockIcon.innerHTML = '🤖<div class="dock-label">Agente IA</div>';
+document.getElementById('dock-apps').appendChild(chatDockIcon);
+
+// Add chat window to winMeta and desktop
+const chatWin = document.createElement('div');
+chatWin.className = 'win';
+chatWin.id = 'win-chat';
+chatWin.innerHTML = `
+  <div class="win-titlebar" onmousedown="dragStart(event,'chat')">
+    <div class="win-controls"><button class="win-ctrl wc-close" onclick="closeWin('chat')"></button><button class="win-ctrl wc-min" onclick="minWin('chat')"></button></div>
+    <div class="win-title">VibeNORMA — Agente Legal IA</div>
+  </div>
+  <div class="chat-sh">
+    <div class="chat-hd"><span style="font-size:16px">⚖️</span><span class="ch-t">VibeNORMA Agent</span><span class="ch-s">28 leyes · Ley 21.719</span></div>
+    <div id="chat-messages">
+      <div class="chat-msg chat-assistant"><div class="chat-msg-hd"><span>🤖</span><span class="chat-nm">VibeNORMA Agent</span></div><div class="chat-msg-bd">Soy el agente legal de VibeNORMA. Tengo acceso a 28 leyes y decretos chilenos incluyendo Ley 21.719 de Protección de Datos. Pregúntame sobre cumplimiento normativo, derechos ARCO, o cualquier tema legal chileno.</div></div>
+    </div>
+    <div class="chat-in"><input id="chat-input" placeholder="Pregunta sobre ley chilena..." onkeydown="chatKey(event)"><button onclick="chatSend()">Enviar</button></div>
+  </div>
+`;
+document.getElementById('desktop').appendChild(chatWin);
+
+if (typeof winMeta !== 'undefined') {
+  winMeta.chat = { title: 'VibeNORMA Agent', el: document.getElementById('win-chat') };
+}
+</script>
+</body>
+</html>
