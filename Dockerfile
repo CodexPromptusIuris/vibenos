@@ -3,6 +3,7 @@ WORKDIR /app
 COPY backend/package*.json ./
 RUN npm install --production
 COPY backend/src ./src
+COPY backend/data ./data
 COPY frontend ./frontend
 EXPOSE 3001
 CMD ["node", "src/server.js"]

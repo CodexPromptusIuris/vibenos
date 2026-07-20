@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 3001;
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // ─── Load law database ──────────────────────────────────────────────
-const LAWS_DIR = path.join(__dirname, '../../frontend/laws');
+const LAWS_DIR = path.join(__dirname, '../frontend/laws');
 const DATA_DIR = path.join(__dirname, '../data');
 
 let lawsDatabase = [];
