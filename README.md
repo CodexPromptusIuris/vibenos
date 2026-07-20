@@ -1,10 +1,4 @@
-https://www.npmjs.com/package/vibenos-mcp
-ión
-npm
-Paquetes de búsqueda
-Buscar
-vibenos-mcp
-1.0.0  • Público • PublicadoHace una hora
+
 Servidor MCP VibeNORMA
 Agente de IA legal chileno: 36 leyes, decretos y reglamentos integrados.
 
