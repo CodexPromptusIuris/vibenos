@@ -4,7 +4,7 @@
 
 const API_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:3001'
-  : 'https://vibenos-api.up.railway.app';
+  : 'https://vibenos-api-production.up.railway.app';
 
 let chatHistory = [];
 

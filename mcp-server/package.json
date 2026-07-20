@@ -1,0 +1,11 @@
+{
+  "name": "vibenos-mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": {
+    "vibenos-mcp": "./index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1"
+  }
+}

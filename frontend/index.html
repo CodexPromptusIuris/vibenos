@@ -1587,7 +1587,7 @@ function termKeydown(e){
 // ═══════════════════════════════════════════════════════
 const API_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost:3001'
-  : window.location.origin.replace('vercel.app','up.railway.app').replace('gobernador','vibenos-api');
+  : 'https://vibenos-api-production.up.railway.app';
 
 let chatHistory = [];
 
