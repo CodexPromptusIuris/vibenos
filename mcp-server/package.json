@@ -1,12 +1,19 @@
 {
   "name": "vibenorma-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MCP server for Chilean legal AI — 97 laws, Ley 21.719, Código Civil, Código Penal, Código del Trabajo",
   "type": "module",
   "bin": {
     "vibenorma-mcp": "./index.js"
   },
-  "keywords": ["mcp", "chilean-law", "legal-ai", "ley-21719", "data-protection", "compliance"],
+  "keywords": [
+    "mcp",
+    "chilean-law",
+    "legal-ai",
+    "ley-21719",
+    "data-protection",
+    "compliance"
+  ],
   "author": "VibeCodingChile SpA",
   "license": "Apache-2.0",
   "repository": {

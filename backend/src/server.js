@@ -20,6 +20,28 @@ const LAWS_DIR = path.join(__dirname, '../frontend/laws');
 const DATA_DIR = path.join(__dirname, '../data');
 
 let lawsDatabase = [];
+let skillsDatabase = [];
+
+async function loadSkills() {
+  console.log('🧠 Loading agent skills...');
+  const skillsDir = path.join(__dirname, '../skills');
+  if (!fs.existsSync(skillsDir)) {
+    console.log('  ⚠️  No skills directory found');
+    return;
+  }
+  const files = fs.readdirSync(skillsDir).filter(f => f.endsWith('.md'));
+  for (const file of files) {
+    try {
+      const text = fs.readFileSync(path.join(skillsDir, file), 'utf-8');
+      const name = file.replace('.md', '');
+      skillsDatabase.push({ name, text });
+      console.log(`  ✅ Skill: ${name}`);
+    } catch (err) {
+      console.log(`  ⚠️  Error loading skill ${file}: ${err.message}`);
+    }
+  }
+  console.log(`🧠 Loaded ${skillsDatabase.length} skills`);
+}
 
 async function loadLaws() {
   console.log('📚 Loading law PDFs...');
@@ -107,6 +129,9 @@ Tienes acceso a las siguientes leyes y documentos chilenos:
 
 ${lawContext}
 
+SKILLS / CONOCIMIENTO ESPECIALIZADO:
+${skillsDatabase.map(s => `--- ${s.name} ---\n${s.text.substring(0, 2000)}`).join('\n\n')}
+
 INSTRUCCIONES:
 - Responde SOLO basandote en la informacion de las leyes proporcionadas
 - Cita siempre el articulo o norma especifica cuando sea posible
@@ -114,11 +139,15 @@ INSTRUCCIONES:
 - Usa un lenguaje claro y profesional
 - Cuando sea relevante, menciona las sanciones o consecuencias legales
 - Si te preguntan sobre un tema no cubierto por las leyes, indica que no tienes informacion al respecto
+- Aplica las best practices de compliance cuando evalues cumplimiento
+- Para deteccion de PII, usa los patrones de la normativa chilena (RUT, email, telefono, direccion)
+- En evaluaciones de riesgo, considera probabilidad, impacto y articulos especificos
 
 FORMATO DE RESPUESTA:
 - Usa negritas para articulos y normas
 - Incluye el nombre completo de la ley cuando la cites
-- Si hay multiples articulos relevantes, listalos`;
+- Si hay multiples articulos relevantes, listalos
+- Para evaluaciones de compliance, incluye un score de cumplimiento (0-100)`;
 
     const messages = [
       ...history.map(h => ({ role: h.role, content: h.content })),
@@ -191,9 +220,11 @@ app.get('*', (req, res) => {
 
 // ─── Start ──────────────────────────────────────────────────────────
 await loadLaws();
+await loadSkills();
 
 app.listen(PORT, () => {
   console.log(`\n🚀 VibeOS Backend running on http://localhost:${PORT}`);
   console.log(`📖 ${lawsDatabase.length} laws loaded`);
+  console.log(`🧠 ${skillsDatabase.length} skills loaded`);
   console.log(`🤖 AI Agent ready`);
 });
