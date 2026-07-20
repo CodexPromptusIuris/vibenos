@@ -1,14 +1,17 @@
 # VibeNORMA MCP Server
 
-**Chilean Legal AI Agent — 36 laws, decrees, and regulations integrated**
+**Chilean Legal AI Agent — 97 laws, decrees, and regulations integrated**
 
 An MCP (Model Context Protocol) server that gives your AI assistant access to the complete Chilean legal database including:
 
 - **Ley 21.719** — Protección de Datos Personales
 - **Código Civil** — Derecho civil chileno
+- **Código Penal** — Derecho penal chileno
+- **Código de Comercio** — Derecho comercial
 - **Código del Trabajo** — Legislación laboral
+- **Código Orgánico de Tribunales** — Organización judicial
 - **Ley 21.459** — Delitos Informáticos
-- **30+ decretos y resoluciones** — Normativa actualizada
+- **60+ decretos, DFLs y resoluciones** — Normativa actualizada
 
 ## Install
 
