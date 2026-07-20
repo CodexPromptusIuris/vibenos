@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VibeNORMA — Buy | Chilean Legal AI Suite</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0A0B0F;color:#E8E9EC;font-family:'Space Grotesk',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
+.card{background:#17191F;border:1px solid #2A2E38;border-radius:16px;padding:48px;max-width:600px;width:100%;text-align:center}
+h1{font-size:32px;font-weight:800;margin-bottom:8px}
+h1 span{color:#8A6FD8}
+.sub{color:#9198A3;font-size:14px;margin-bottom:32px}
+.price{font-size:48px;font-weight:800;color:#8A6FD8;margin:24px 0 8px}
+.period{color:#5A606B;font-size:13px}
+.features{text-align:left;margin:24px 0}
+.features li{padding:8px 0;font-size:14px;color:#9198A3;border-bottom:1px solid #2A2E38;list-style:none}
+.features li::before{content:"✓ ";color:#5FBF7A;font-weight:700}
+.tiers{display:grid;gap:16px;margin:32px 0}
+.tier{background:#1D2028;border:1px solid #2A2E38;border-radius:12px;padding:24px;text-align:left;cursor:pointer;transition:all .2s}
+.tier:hover{border-color:#8A6FD8;transform:translateY(-2px)}
+.tier.popular{border-color:#8A6FD8;position:relative}
+.tier.popular::after{content:"POPULAR";position:absolute;top:-10px;right:16px;background:#8A6FD8;color:#fff;font-size:9px;font-weight:700;padding:3px 10px;border-radius:10px;letter-spacing:.1em}
+.tier-name{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:#5A606B;margin-bottom:4px}
+.tier-price{font-size:24px;font-weight:800;color:#E8E9EC}
+.tier-price span{font-size:13px;color:#5A606B;font-weight:400}
+.tier-desc{font-size:12px;color:#9198A3;margin-top:4px}
+.btn{display:block;width:100%;padding:14px;background:#8A6FD8;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;margin-top:16px;transition:opacity .2s}
+.btn:hover{opacity:.85}
+.btn.gumroad{background:#FF90E8}
+.btn.lemon{background:#FFC233;color:#000}
+.footer{margin-top:32px;font-size:12px;color:#5A606B}
+.footer a{color:#8A6FD8;text-decoration:none}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:24px 0}
+.stat{text-align:center}
+.stat-num{font-size:24px;font-weight:800;color:#8A6FD8}
+.stat-lbl{font-size:10px;color:#5A606B;text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Vibe<span>NORMA</span></h1>
+  <p class="sub">Chilean Legal AI Suite — 97 laws, 252 skills, 12 MCP tools</p>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-num">97</div><div class="stat-lbl">Leyes</div></div>
+    <div class="stat"><div class="stat-num">252</div><div class="stat-lbl">Skills</div></div>
+    <div class="stat"><div class="stat-num">12</div><div class="stat-lbl">Tools</div></div>
+  </div>
+
+  <ul class="features">
+    <li>MCP Server for Claude Desktop, Cursor, Windsurf</li>
+    <li>97 Chilean laws: Codigo Penal, Civil, Ley 21.719, etc.</li>
+    <li>252 AI reasoning skills for better answers</li>
+    <li>Generate contracts, demandas, compliance reports</li>
+    <li>Anonymize PII (RUT, email, phone, address)</li>
+    <li>Real-time API with 99.9% uptime</li>
+  </ul>
+
+  <div class="tiers">
+    <div class="tier">
+      <div class="tier-name">Starter</div>
+      <div class="tier-price">$29 <span>one-time</span></div>
+      <div class="tier-desc">MCP Server + API access</div>
+    </div>
+    <div class="tier popular">
+      <div class="tier-name">Pro</div>
+      <div class="tier-price">$79 <span>one-time</span></div>
+      <div class="tier-desc">MCP + API + Dashboard + Support</div>
+    </div>
+    <div class="tier">
+      <div class="tier-name">Enterprise</div>
+      <div class="tier-price">$199 <span>one-time</span></div>
+      <div class="tier-desc">Everything + Custom skills + SLA</div>
+    </div>
+  </div>
+
+  <a href="https://vibe-norma.gumroad.com" class="btn gumroad">Buy on Gumroad</a>
+  <a href="https://vibe-norma.lemonsqueezy.com" class="btn lemon" style="margin-top:8px">Buy on Lemon Squeezy</a>
+
+  <div class="footer">
+    <p>Made by <a href="https://vibecodingchile.cl">VibeCodingChile SpA</a> — Santiago, Chile</p>
+    <p style="margin-top:8px">Questions? <a href="mailto:contacto@vibecodingchile.cl">contacto@vibecodingchile.cl</a></p>
+  </div>
+</div>
+</body>
+</html>
